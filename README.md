@@ -19,7 +19,7 @@ Ist der Token erstellt, muss dieser im Dashboard eingegeben werden. Hierzu gibt 
 Zunächst ist die URL der API also "https://api.speisekammer.app" einzugeben. Dann der erzeugte Token. Es wird eine Datei mit dem entsprechenden Setup angelegt. Das "Setup2" kann genutzt werden falls ein weiterer Zugriff auf ein anderes Konto bzw. auf die "Staging" oder Entwickler-Version des API zugegriffen werden. Bei einem Neustart wird immer Setup1 geladen.
 
 # Bedienung
-Die Funktionsbuttons im unteren Bereich des Dashboards sollten für sich sprechen. Nahezu alle Funktionen lassen sich per Einlesen eines Barcodes bedienen. Eine Liste verfügabrer Barcodes ist in der Excel Liste enthalten. Soll zu einem neu zu erfassenden Artikel das Verfallsdatum eingegeben werden, so ist dieses vor der Eingabe des Artikels zu scannen. Wird der gleiche Artikel mehrfache gescannt wird das gleiche Verfallsdatum verwendet.
+Die Funktionsbuttons im unteren Bereich des Dashboards sollten für sich sprechen. Nahezu alle Funktionen lassen sich per Einlesen eines Barcodes bedienen. Eine Liste verfügabrer Befehle ist im Comment Barcodes im Flow enthalten. Soll zu einem neu zu erfassenden Artikel das Verfallsdatum eingegeben werden, so ist dieses vor der Eingabe des Artikels zu scannen. Wird der gleiche Artikel mehrfache gescannt wird das gleiche Verfallsdatum verwendet.
 
 # Sets
 Sets darf man sich wie einen 6er Wasser vorstellen. Diese sog. Sets haben eigene Barcodes. Sind sie einmal erfasst, werden durch einmaliges Scannen des Sets automatisch die entsprechende Anzahl von Einzelartikeln hinzugefügt
