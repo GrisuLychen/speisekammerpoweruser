@@ -191,7 +191,7 @@
         "type": "debug",
         "z": "df2a5801fca17d05",
         "name": "debug 63",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -226,7 +226,7 @@
         "type": "function",
         "z": "df2a5801fca17d05",
         "name": "function 58",
-        "func": "//var webside = \"https://staging.api.speisekammer.app\"\n//var token = \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJZdDR3M2l5M3VoZ0o1UmVTWlk0ZlBmVDd2YkczIiwicm9sZXMiOlsid3JpdGUiXSwiaWF0IjoxNzA2NTM5NDUyLCJleHAiOjE3MzgwOTcwNTJ9.-FwWTTSQXNVl9SrA6TnMi9e9fnUkXPPg1HeKs_XHuDc\"\n\nvar webside = msg.payload.url\nvar token = msg.payload.token\n\nflow.set(\"webside\",webside)\nflow.set(\"token\",token)\n\nmsg.url = webside+\"/communities\"\nmsg.headers = {};\nmsg.headers['Authorization'] = 'Bearer '+token;\n\nreturn msg;\n\nreturn msg;",
+        "func": "//var webside = \"https://staging.api.speisekammer.app\"\n\n\nvar webside = msg.payload.url\nvar token = msg.payload.token\n\nflow.set(\"webside\",webside)\nflow.set(\"token\",token)\n\nmsg.url = webside+\"/communities\"\nmsg.headers = {};\nmsg.headers['Authorization'] = 'Bearer '+token;\n\nreturn msg;\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -249,8 +249,8 @@
         "tooltip": "",
         "group": "b5196438b63bee02",
         "order": 1,
-        "width": 0,
-        "height": 0,
+        "width": 8,
+        "height": 1,
         "passthru": false,
         "mode": "text",
         "delay": "0",
@@ -320,7 +320,7 @@
         "voice": "Microsoft Katja - German (Germany)",
         "always": true,
         "x": 820,
-        "y": 2240,
+        "y": 2660,
         "wires": []
     },
     {
@@ -328,7 +328,7 @@
         "type": "function",
         "z": "df2a5801fca17d05",
         "name": "Check Barcode",
-        "func": "msg.gtin=msg.payload\n\nswitch (msg.payload[0]) {\n    case \"$\":\n\n        return [null, msg, null]\n   \n    case \"#\":\n        return [null, null, msg]\n\n    default:\n        return [msg,null,null]\n\n}\n\n",
+        "func": "\n\n\nmsg.gtin=msg.payload\n\n\nswitch (msg.payload[0]) {\n    case \"$\":\n\n        return [null, msg, null]\n   \n    case \"#\":\n        return [null, null, msg]\n    \n    case \"-\":\n        if (msg.payload.length != 8 ) {\n            return [msg, null, null]\n        }\n      break\n\n    default:\n        if (msg.payload.length > 8 || msg.payload.length < 13) {\n            return [msg, null, null]\n        }\n        break\n        \n\n}\n\n",
         "outputs": 3,
         "noerr": 0,
         "initialize": "",
@@ -357,7 +357,7 @@
         "z": "df2a5801fca17d05",
         "group": "b5196438b63bee02",
         "name": "",
-        "order": 3,
+        "order": 4,
         "width": 0,
         "height": 0,
         "format": "<script>\n    var el = document.querySelectorAll(\"input[type=\\\"text\\\"\")[0],\n    \n        setFocus = function() {\n            if (el) {\n                el.focus();\n            }\n            \n            setTimeout(setFocus, 100);\n        };\n    \n    setFocus();\n    \n</script>",
@@ -378,9 +378,9 @@
         "z": "df2a5801fca17d05",
         "name": "",
         "group": "b5196438b63bee02",
-        "order": 8,
-        "width": 0,
-        "height": 0,
+        "order": 6,
+        "width": 5,
+        "height": 1,
         "passthru": false,
         "label": "Erfassung",
         "tooltip": "",
@@ -393,7 +393,7 @@
         "topic": "topic",
         "topicType": "msg",
         "x": 380,
-        "y": 2240,
+        "y": 2500,
         "wires": [
             [
                 "873df93a4654a32d"
@@ -406,9 +406,9 @@
         "z": "df2a5801fca17d05",
         "name": "",
         "group": "b5196438b63bee02",
-        "order": 9,
-        "width": 0,
-        "height": 0,
+        "order": 7,
+        "width": 5,
+        "height": 1,
         "passthru": false,
         "label": "Ausgabe",
         "tooltip": "",
@@ -421,7 +421,7 @@
         "topic": "topic",
         "topicType": "msg",
         "x": 380,
-        "y": 2280,
+        "y": 2540,
         "wires": [
             [
                 "625c40bc23279aa2"
@@ -440,7 +440,7 @@
         "finalize": "",
         "libs": [],
         "x": 550,
-        "y": 2240,
+        "y": 2500,
         "wires": [
             [
                 "caeadd440daf9b59",
@@ -460,7 +460,7 @@
         "finalize": "",
         "libs": [],
         "x": 550,
-        "y": 2280,
+        "y": 2540,
         "wires": [
             [
                 "caeadd440daf9b59",
@@ -477,9 +477,9 @@
         "tooltip": "",
         "place": "Select option",
         "group": "b5196438b63bee02",
-        "order": 5,
-        "width": 0,
-        "height": 0,
+        "order": 2,
+        "width": 7,
+        "height": 1,
         "passthru": true,
         "multiple": false,
         "options": [],
@@ -536,7 +536,7 @@
         "z": "df2a5801fca17d05",
         "name": "",
         "group": "1ef0514ec8cc871c",
-        "order": 4,
+        "order": 1,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -564,9 +564,9 @@
         "z": "df2a5801fca17d05",
         "name": "",
         "group": "b5196438b63bee02",
-        "order": 7,
-        "width": 0,
-        "height": 0,
+        "order": 3,
+        "width": 4,
+        "height": 1,
         "passthru": false,
         "label": "Liste anzeigen",
         "tooltip": "",
@@ -592,22 +592,78 @@
         "z": "df2a5801fca17d05",
         "group": "b5196438b63bee02",
         "name": "",
-        "order": 6,
-        "width": "19",
-        "height": "7",
-        "columns": [],
-        "outputs": 0,
-        "cts": false,
+        "order": 5,
+        "width": 19,
+        "height": 4,
+        "columns": [
+            {
+                "field": "Name",
+                "title": "Name",
+                "width": "300",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "Barcode",
+                "title": "Barcode",
+                "width": "120",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "Anzahl",
+                "title": "Anzahl",
+                "width": "70",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "Ablaufdatum",
+                "title": "Ablaufdatum",
+                "width": "110",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "Beschreibung",
+                "title": "Beschreibung",
+                "width": "",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            }
+        ],
+        "outputs": 1,
+        "cts": true,
         "x": 1210,
         "y": 840,
-        "wires": []
+        "wires": [
+            [
+                "4d43fb2819e22d91",
+                "b3468a4c529ad293"
+            ]
+        ]
     },
     {
         "id": "ceebe38846e45f1f",
         "type": "function",
         "z": "df2a5801fca17d05",
         "name": "Prepare Table",
-        "func": "var options = [];\nlet length = msg.payload.length\nvar name\nvar gtin\nvar count\nvar bestbefore\nvar description\n\n\nfor (let x = 0; x < length; x++) {\n    \n    name = msg.payload[x].name;\n    gtin = msg.payload[x].gtin;\n    count = msg.payload[x].attributes[0].count\n    bestbefore = msg.payload[x].attributes[0].bestBeforeDate\n    description = msg.payload[x].description??\"\";\n    if (typeof bestbefore == \"undefined\"){\n        bestbefore=\"-\"\n    }\n    options.push({ \"Name\": name, \"Barcode\": gtin, \"Anzahl\": count, \"Ablaufdatum\":bestbefore ,\"Beschreibung\":description});    \n    if (msg.payload[x].attributes.length>1){\n\n        for (let y = 1; y < msg.payload[x].attributes.length; y++) {\n            count = msg.payload[x].attributes[y].count\n            bestbefore = msg.payload[x].attributes[y].bestBeforeDate\n            if (typeof bestbefore == \"undefined\") {\n                bestbefore = \"-\"\n            }\n            options.push({ \"Name\": \"+\", \"Barcode\": \"+\", \"Anzahl\": count, \"Ablaufdatum\": bestbefore });\n        }\n    }\n\n }\nmsg = { payload: msg.payload.length };\nmsg.payload = options;\nreturn msg;\n",
+        "func": "var options = [];\nlet length = msg.payload.length\nvar name\nvar gtin\nvar count\nvar bestbefore\nvar description\n\nif (msg.payload==[]){\n    \n    return msg;\n}\n\nfor (let x = 0; x < length; x++) {\n    \n    name = msg.payload[x].name;\n    gtin = msg.payload[x].gtin;\n    if (msg.payload[x].attributes.length > 0) {\n        count = msg.payload[x].attributes[0].count ??0\n        bestbefore = msg.payload[x].attributes[0].bestBeforeDate ??\"-\"\n        description = msg.payload[x].description??\"\";\n    if (typeof bestbefore == \"undefined\"){\n        bestbefore=\"-\"\n        }\n      options.push({ \"Name\": name, \"Barcode\": gtin, \"Anzahl\": count, \"Ablaufdatum\":bestbefore ,\"Beschreibung\":description});    \n    } else {\n        description = msg.payload[x].description ?? \"\";\n        if (typeof bestbefore == \"undefined\") {\n            bestbefore = \"-\"\n        }\n     options.push({ \"Name\": name, \"Barcode\": gtin, \"Anzahl\": \"-\", \"Ablaufdatum\": \"-\", \"Beschreibung\": description });\n\n    }\n\n    if (msg.payload[x].attributes.length>1){\n\n        for (let y = 1; y < msg.payload[x].attributes.length; y++) {\n            count = msg.payload[x].attributes[y].count??0\n            \n            bestbefore = msg.payload[x].attributes[y].bestBeforeDate\n            if (typeof bestbefore == \"undefined\") {\n                bestbefore = \"-\"\n            }\n            options.push({ \"Name\": \"+\", \"Barcode\": \"+\", \"Anzahl\": count, \"Ablaufdatum\": bestbefore });\n        }\n    }\n\n }\nmsg = { payload: msg.payload.length };\nmsg.payload = options;\nreturn msg;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -634,7 +690,7 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1220,
+        "x": 1180,
         "y": 880,
         "wires": []
     },
@@ -704,7 +760,7 @@
         "type": "function",
         "z": "df2a5801fca17d05",
         "name": "Vorbereitung Tabelle",
-        "func": "if (typeof msg.payload.status != \"undefined\") {\n    msg.payload=[{\"INFO\":\"- Artikel nicht im Vorrat des Lagerortes -\"}]\n    return [null, msg]\n}\n\n\nmsg.payload =[msg.payload];\n\nreturn [msg, null]",
+        "func": "if (typeof msg.payload.status != \"undefined\") {\n    msg.payload = [];\n  var  msg2 ={};\n  msg2.payload=\"Artikel nicht im Vorrat des Lagerortes\"\n    return [msg, msg2]\n}\n\n\nmsg.payload =[msg.payload];\n\nreturn [msg, null]",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
@@ -714,30 +770,12 @@
         "y": 900,
         "wires": [
             [
-                "3014138be1798775",
                 "ceebe38846e45f1f"
             ],
             [
-                "3014138be1798775",
-                "0cabac38e8120452"
+                "f157011fd5c80a1b"
             ]
         ]
-    },
-    {
-        "id": "3014138be1798775",
-        "type": "debug",
-        "z": "df2a5801fca17d05",
-        "name": "debug 67",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1040,
-        "y": 900,
-        "wires": []
     },
     {
         "id": "fddc574b7f180e59",
@@ -746,10 +784,11 @@
         "name": "link in 42",
         "links": [
             "1784357cdf144d36",
-            "c05bab02ca2774eb"
+            "c05bab02ca2774eb",
+            "39e5df2c5ffba1a7"
         ],
         "x": 145,
-        "y": 2240,
+        "y": 2500,
         "wires": [
             [
                 "7219c64ce24782a0"
@@ -763,10 +802,11 @@
         "name": "link in 43",
         "links": [
             "1784357cdf144d36",
-            "c05bab02ca2774eb"
+            "c05bab02ca2774eb",
+            "39e5df2c5ffba1a7"
         ],
         "x": 145,
-        "y": 2280,
+        "y": 2540,
         "wires": [
             [
                 "5bdbade10ce056c8"
@@ -784,10 +824,11 @@
             "85287d42b5670ae4",
             "cf8154f797aa603b",
             "add4c0b1fee25743",
-            "01f4172636923fda"
+            "01f4172636923fda",
+            "be09463715c7c5de"
         ],
         "x": 775,
-        "y": 2300,
+        "y": 2560,
         "wires": []
     },
     {
@@ -927,7 +968,7 @@
         "type": "function",
         "z": "df2a5801fca17d05",
         "name": "Put Änderungen",
-        "func": "var item = msg.payload\nvar msg = { payload: msg.payload.length };\nvar community = flow.get(\"ComID\")\nvar webside = flow.get(\"webside\")\nvar token = flow.get(\"token\")\nvar storage = flow.get(\"StorLocations\")\nvar status = flow.get(\"FunktionStatus\");\nvar bestbefore\nvar items=1\nvar description \nvar group = {}\nvar msg2 = {}\n\n// Wenn Artikel nicht gefunden wird kommt ein status 404 zurück daher wird hier manuell\n// ein leeres Item gebaut\nif (typeof item.status != \"undefined\") {\n    item={};\n    item.notfound=true;\n    item.gtin=flow.get(\"gtintemp\");\n    item.name=\"unbekannter Artikel\"\n    item.attributes=[];\n    item.attributes.push({\"count\":0})\n}\n// Wenn es zum Item eine Beschreibung gibt (wenn die Beschreibung nicht nicht beschreiben ist)\n// und wenn an erste Position der Beschreibung ein { zu finden ist also ein JSON Objekt festgelegt wurde\nif ((typeof item.description !=\"undefined\") && item.description[0]==\"{\"){\n    // Wenn dem so ist, dann wird das Json geparst und Objekt gebaut\nvar setinfo = JSON.parse(item.description ?? \"{ \\\"isset\\\": false, \\\"items\\\": 6, \\\"gtin\\\": \\\"13445\\\" , \\\"isingroup\\\": false , \\\"groupgtin\\\" : \\\"abc\\\"}\") // das hintere Objekt ist nur das der Parse nicht knallt\n    if(setinfo.isset){\n        item.gtin = setinfo.gtin ?? item.gtin // entweder es gibt schon ein Info das es ein set ist oder wenn das undefined oder null ist wird die Produkt gtin verwendet\n        items=setinfo.items??1  // auslesen wieviel Items im Set enthalten sind wenn nicht 1\n        group.isingrupe=setinfo.isingroup??false // Gehört der Artikel in eine Gruppe\n        group.gtin = (setinfo.groupgtin??\"Gabc\") // GroupGtin\n    }\n}\n\nflow.set(\"gtintemp\",null); // löschen des temporären gtins welcher gesetzt ist fals der Artiekel nicht bekannt ist ud ein 404 kommt\n\n//Anfrage vorbereiten\nif (item.gtin[0]==\"G\"){ // so soll ein Group Gtin aussehen, erster Buchstabe \"G\"\n    msg.url = webside + \"/stock/\" + community + \"/\" + flow.get(\"Gruppenlager\")??storage; // Wenn es eine Group gTin ist dann ab ins Gruppenlager\n} else {\n    msg.url = webside + \"/stock/\" + community + \"/\" + storage; // sonst das gespeicherte Lager nutzen\n}\n\n// Hier wird die Anfrage zusammen gebaut\nmsg.headers = {};\nmsg.headers['Authorization'] = 'Bearer ' + token;\n\n\n\n//Ab hier kommt die eigentliche Änderung eines bekannten Artikels\nvar attributanzahl = item.attributes.length \n\n// Status 1 Eingabe\nif (status == 1) {\n    var datum = flow.get(\"MHDDatum\")\n     // wenn vorher ein MHD gesetzt wurde wird es genutzt sonst gibts ein Objekt fals dran\n    if (datum.fertig){ // wenn das datum fertig war\n         //datum.used=true; // markieren das das Datum genutzt wurde\n         for (let y = 0; y < attributanzahl; y++){ // durchlaufen aller attribute\n            if (typeof item.attributes[y].bestBeforeDate != \"undefined\") { // wenn ein bestbefore gesetzt ist\n              if (item.attributes[y].bestBeforeDate==datum.mhd){ // wenn das bestbefore gleich dem neu erfassten datum\n                  item.attributes[y].count = item.attributes[y].count + items;  // dann fügen wir hier die items hinzu (nicht nur eins da es ja ein set sein könnte)\n                    break;\n               } \n                 if (y == attributanzahl - 1 && item.attributes[y].bestBeforeDate != datum.mhd) { // wenn das gleiche Datum nicht gefunden wurde und wir schon an der letzten stelle sind\n                  item.attributes.push({ \"count\": items, \"bestBeforeDate\":datum.mhd }); // dann fügen wir ein neues Element der Liste hinzu und nutzten unser neues Datum\n                 break;\n                } \n             } else {\n           }\n             if (typeof item.attributes[y].bestBeforeDate == \"undefined\" && y == attributanzahl - 1)\n                item.attributes.push({ \"count\": items, \"bestBeforeDate\": datum.mhd }); // wir haben die ganze Liste durchsucht und sind beim letzten Eintrag angekommen, keiner stimmt überein also müssen wir einen neuen erzeugen\n         }\n     } else { // hier ist das Datum nicht eingegeben\n     bestbefore = item.attributes[attributanzahl-1].bestBeforeDate \n    if (typeof bestbefore == \"undefined\") { // bestbefore nicht definiert\n        \n            item.attributes[attributanzahl - 1].count = item.attributes[attributanzahl - 1].count + items;  // dann einfach hinzufügen\n    }\n    else{\n        \n            item.attributes.push({\"count\" :  items}); // sonst listenelement hinzu\n       \n    }\n     }\n    msg.payload = item; // Item an Payload dran\n\n    if (group.isingrupe){  //vvhbjhgvghj // haben wir eine Gruppe dann extrarunde\n        msg2.gtin = group.groupgtin\n        return [msg, msg2];  \n    } else {\n     return [msg, null];   // sonst raus an den request\n    }\n\n    \n}\n//Status 2 Ausgabe\n if (status == 2) {\n     if (item.notfound??false ){\n         return null\n     }\n        item.attributes[0].count = item.attributes[0].count - 1;\n    if (item.attributes[0].count<1){\n        if (attributanzahl>1) {\n            item.attributes.shift();\n        } else {\n            item.attributes.shift();\n            item.attributes.push({ \"count\": 0 });\n        }\n        \n         }\n     msg.payload = item;\n     if (group.isingrupe) { //hgghjkjhgv\n        \n         msg2.gtin = group.groupgtin\n         return [msg, msg2];\n     } else {\n         return [msg, null];\n     }        \n} \n//Status 51 52 53 Bestätigung Artikel\nif (status == 51||status==52 || status==53){\n      if ((typeof item.description != \"undefined\")) {\n          item.description = item.description.replace(\"Added by REST API via GTIN \"+ item.gtin,\"leer\")\n      }\n      flow.set(\"FunktionStatus\",status-50); //rücksetzen auf alten Status\n      msg.payload = item;\n    return [msg, null];\n}\n\n//Status 61 63 Erzeuge Set\nif (status == 61 || status == 63) {\n    if (typeof item.description == \"undefined\") {\n        item.description = \"{\\\"text\\\" :  \\\"\\\", \\\"isset\\\": false, \\\"items\\\": 1, \\\"gtin\\\": \\\"<setgtin>\\\" }\"\n    } else if (item.description[0] == \"{\"){\n        description = {}\n        description=JSON.parse(item.description)\n        description.isset=true\n        description.items=\"<itemanzahl>\"\n        description.gtin=\"<setgtin>\"\n        item.description = JSON.stringify(description)\n    } else {\n         item.description = \"{\\\"text\\\" :  \\\"\" + item.description + \"\\\", \\\"isset\\\": true, \\\"items\\\": <itemanzahl>, \\\"gtin\\\": \\\"<setgtin>\\\" }\"\n    }\n\n    flow.set(\"FunktionStatus\", status - 60); //rücksetzen auf alten Status\n    msg.payload = item;\n    return [msg, null];\n}\n\n//Status 71 73 Gruppe festlegen\nif (status == 71 || status == 73) { // nur im Status Eingabe und Info\n    if (typeof item.description == \"undefined\") { // Wenn es keine Beschreibung gibt ist es einfach \n        item.description = \"{\\\"text\\\" :  \\\"\\\", \\\"isingroup\\\": false, \\\"groupgtin\\\": \\\"<setgtin>\\\" }\" // JSON in die Description fertig\n    } else if (item.description[0] == \"{\") { // irgendwas ist in der Description und es beginnt mit { also ein JSON Objekt\n            description = {}\n            description = JSON.parse(item.description)\n            description.isingroup = true\n            description.groupgtin = \"<groupegtin>\"\n            item.description = JSON.stringify(description)\n        } else { // Description ist befüllt aber mit keinem Objekt\n        item.description = \"{\\\"text\\\" :  \\\"\" + item.description + \"\\\", \\\"isingroup\\\": true, \\\"groupgtin\\\": \\\"<setgtin>\\\" }\" // dann los wir machen ein JSOn Objekt draus\n        }\n\n    flow.set(\"FunktionStatus\", status - 70); //rücksetzen auf alten Status\n    msg.payload = item;\n    return [msg, null];\n}\n\n",
+        "func": "var item = msg.payload\nvar msg = { payload: msg.payload.length };\nvar community = flow.get(\"ComID\")\nvar webside = flow.get(\"webside\")\nvar token = flow.get(\"token\")\nvar storage = flow.get(\"StorLocations\")\nvar status = flow.get(\"FunktionStatus\");\nvar bestbefore\nvar items=1\nvar description \nvar group = {}\nvar msg2 = {}\n\n// Wenn Artikel nicht gefunden wird kommt ein status 404 zurück daher wird hier manuell\n// ein leeres Item gebaut\nif (typeof item.status != \"undefined\") {\n    item={};\n    item.notfound=true;\n    item.gtin=flow.get(\"gtintemp\");\n    item.name=\"unbekannter Artikel\"\n    item.attributes=[];\n    item.attributes.push({\"count\":0})\n}\n// Wenn es zum Item eine Beschreibung gibt (wenn die Beschreibung nicht nicht beschreiben ist)\n// und wenn an erste Position der Beschreibung ein { zu finden ist also ein JSON Objekt festgelegt wurde\nif ((typeof item.description !=\"undefined\") && item.description[0]==\"{\"){\n    // Wenn dem so ist, dann wird das Json geparst und Objekt gebaut\nvar setinfo = JSON.parse(item.description ?? \"{ \\\"isset\\\": false, \\\"items\\\": 6, \\\"gtin\\\": \\\"13445\\\" , \\\"isingroup\\\": false , \\\"groupgtin\\\" : \\\"abc\\\"}\") // das hintere Objekt ist nur das der Parse nicht knallt\n    if(setinfo.isset){\n        item.gtin = setinfo.gtin ?? item.gtin // entweder es gibt schon ein Info das es ein set ist oder wenn das undefined oder null ist wird die Produkt gtin verwendet\n        items=setinfo.items??1  // auslesen wieviel Items im Set enthalten sind wenn nicht 1\n        group.isingrupe=setinfo.isingroup??false // Gehört der Artikel in eine Gruppe\n        group.gtin = (setinfo.groupgtin??\"Gabc\") // GroupGtin\n    }\n}\n\nflow.set(\"gtintemp\",null); // löschen des temporären gtins welcher gesetzt ist fals der Artiekel nicht bekannt ist ud ein 404 kommt\n\n//Anfrage vorbereiten\nif (item.gtin[0]==\"G\"){ // so soll ein Group Gtin aussehen, erster Buchstabe \"G\"\n    msg.url = webside + \"/stock/\" + community + \"/\" + flow.get(\"Gruppenlager\")??storage; // Wenn es eine Group gTin ist dann ab ins Gruppenlager\n} else {\n    msg.url = webside + \"/stock/\" + community + \"/\" + storage; // sonst das gespeicherte Lager nutzen\n}\n\n// Hier wird die Anfrage zusammen gebaut\nmsg.headers = {};\nmsg.headers['Authorization'] = 'Bearer ' + token;\n\n\n\n//Ab hier kommt die eigentliche Änderung eines bekannten Artikels\nvar attributanzahl = item.attributes.length \n\n// Status 1 Eingabe\nif (status == 1) {\n    var datum = flow.get(\"MHDDatum\")\n     // wenn vorher ein MHD gesetzt wurde wird es genutzt sonst gibts ein Objekt fals dran\n    if (datum.fertig){ // wenn das datum fertig war\n         //datum.used=true; // markieren das das Datum genutzt wurde\n         for (let y = 0; y < attributanzahl; y++){ // durchlaufen aller attribute\n            if (typeof item.attributes[y].bestBeforeDate != \"undefined\") { // wenn ein bestbefore gesetzt ist\n              if (item.attributes[y].bestBeforeDate==datum.mhd){ // wenn das bestbefore gleich dem neu erfassten datum\n                  item.attributes[y].count = item.attributes[y].count + items;  // dann fügen wir hier die items hinzu (nicht nur eins da es ja ein set sein könnte)\n                    break;\n               } \n                 if (y == attributanzahl - 1 && item.attributes[y].bestBeforeDate != datum.mhd) { // wenn das gleiche Datum nicht gefunden wurde und wir schon an der letzten stelle sind\n                  item.attributes.push({ \"count\": items, \"bestBeforeDate\":datum.mhd }); // dann fügen wir ein neues Element der Liste hinzu und nutzten unser neues Datum\n                 break;\n                } \n             } else {\n           }\n             if (typeof item.attributes[y].bestBeforeDate == \"undefined\" && y == attributanzahl - 1)\n                item.attributes.push({ \"count\": items, \"bestBeforeDate\": datum.mhd }); // wir haben die ganze Liste durchsucht und sind beim letzten Eintrag angekommen, keiner stimmt überein also müssen wir einen neuen erzeugen\n         }\n     } else { // hier ist das Datum nicht eingegeben\n     bestbefore = item.attributes[attributanzahl-1].bestBeforeDate \n    if (typeof bestbefore == \"undefined\") { // bestbefore nicht definiert\n        \n            item.attributes[attributanzahl - 1].count = item.attributes[attributanzahl - 1].count + items;  // dann einfach hinzufügen\n    }\n    else{\n        \n            item.attributes.push({\"count\" :  items}); // sonst listenelement hinzu\n       \n    }\n     }\n    msg.payload = item; // Item an Payload dran\n\n    if (group.isingrupe){  //vvhbjhgvghj // haben wir eine Gruppe dann extrarunde\n        msg2.gtin = group.groupgtin\n        return [msg, msg2];  \n    } else {\n     return [msg, null];   // sonst raus an den request\n    }\n\n    \n}\n//Status 2 Ausgabe\n if (status == 2) {\n     if (item.notfound??false ){\n         return null\n     }\n        item.attributes[0].count = item.attributes[0].count - 1;\n    if (item.attributes[0].count<1){\n        if (attributanzahl>1) {\n            item.attributes.shift();\n        } else {\n            item.attributes.shift();\n            item.attributes.push({ \"count\": 0 });\n        }\n        \n         }\n     msg.payload = item;\n     if (group.isingrupe) { //hgghjkjhgv\n        \n         msg2.gtin = group.groupgtin\n         return [msg, msg2];\n     } else {\n         return [msg, null];\n     }        \n} \n//Status 51 52 53 Bestätigung Artikel\nif (status == 51||status==52 || status==53){\n      if ((typeof item.description != \"undefined\")) {\n          item.description = item.description.replace(\"Added by REST API via GTIN \"+ item.gtin,\"-\")\n      }\n    //  flow.set(\"FunktionStatus\",status-50); //rücksetzen auf alten Status\n      msg.payload = item;\n    return [msg, null];\n}\n\n//Status 61 63 Erzeuge Set\nif (status == 61 || status == 63) {\n    if (typeof item.description == \"undefined\") {\n        item.description = \"{\\\"text\\\" :  \\\"\\\", \\\"isset\\\": false, \\\"items\\\": \" + (flow.get(\"SetItemAnzahl\") ?? \"1\")+\", \\\"gtin\\\": \\\"\" + (flow.get(\"SetGTIN\") ?? \"<setgtin>\")+\"\\\" }\"\n    } else if (item.description[0] == \"{\"){\n        description = {}\n        description=JSON.parse(item.description)\n        if (description.isset??false){\n            description.isset=false;\n        } else {\n        description.isset=true\n            description.items = flow.get(\"SetItemAnzahl\") ?? \"<itemanzahl>\"\n            description.gtin = flow.get(\"SetGTIN\")??\"<setgtin>\"\n        }\n        item.description = JSON.stringify(description)\n    } else {\n        item.description = \"{\\\"text\\\" :  \\\"\" + item.description + \"\\\", \\\"isset\\\": true, \\\"items\\\": \" + (flow.get(\"SetItemAnzahl\") ?? \"<itemanzahl>\") + \", \\\"gtin\\\": \\\"\" + (flow.get(\"SetGTIN\") ?? \"<setgtin>\")+\"\\\" }\"\n    }\n\n  //  flow.set(\"FunktionStatus\", status - 60); //rücksetzen auf alten Status\n    msg.payload = item;\n    return [msg, null];\n}\n\n//Status 71 73 Gruppe festlegen\nif (status == 71 || status == 73) { // nur im Status Eingabe und Info\n    if (typeof item.description == \"undefined\") { // Wenn es keine Beschreibung gibt ist es einfach \n        item.description = \"{\\\"text\\\" :  \\\"\\\", \\\"isingroup\\\": false, \\\"groupgtin\\\": \\\"<setgtin>\\\" }\" // JSON in die Description fertig\n    } else if (item.description[0] == \"{\") { // irgendwas ist in der Description und es beginnt mit { also ein JSON Objekt\n            description = {}\n            description = JSON.parse(item.description)\n        if (description.isingroup ?? false) {\n            description.isingroup = false;\n        } else {\n            description.isingroup = true\n            description.groupgtin = \"<groupegtin>\"\n        }\n            item.description = JSON.stringify(description)\n        } else { // Description ist befüllt aber mit keinem Objekt\n        item.description = \"{\\\"text\\\" :  \\\"\" + item.description + \"\\\", \\\"isingroup\\\": true, \\\"groupgtin\\\": \\\"<setgtin>\\\" }\" // dann los wir machen ein JSOn Objekt draus\n        }\n\n    // flow.set(\"FunktionStatus\", status - 70); //rücksetzen auf alten Status\n    msg.payload = item;\n    return [msg, null];\n}\n\n//Status 81 83 Namen ändern\nif (status == 81 || status == 83) { // nur im Status Eingabe und Info\n    item.name = flow.get(\"NewName\")??item.name;\n\n  //  flow.set(\"FunktionStatus\", status - 80); //rücksetzen auf alten Status\n    msg.payload = item;\n    return [msg, null];\n}\n\n//Status 91 93 Namen ändern\nif (status == 91 || status == 93) { // nur im Status Eingabe und Info\n     var beschreibung = flow.get(\"New_Description\") ?? \"\"\n    if (typeof item.description == \"undefined\") { // Wenn es keine Beschreibung gibt ist es einfach \n        item.description = \"{\\\"text\\\" :  \\\"\" + beschreibung+\"\\\" }\" // JSON in die Description fertig\n    } else if (item.description[0] == \"{\") { // irgendwas ist in der Description und es beginnt mit { also ein JSON Objekt\n        description = {}\n        description = JSON.parse(item.description)\n        description.text = description.text + beschreibung;\n        item.description = JSON.stringify(description)\n    } else { // Description ist befüllt aber mit keinem Objekt\n        item.description = \"{\\\"text\\\" :  \\\"\" + item.description + \" \"+ beschreibung+ \"\\\", \\\"isingroup\\\": true, \\\"groupgtin\\\": \\\"<setgtin>\\\" }\" // dann los wir machen ein JSOn Objekt draus\n    }\n    //  flow.set(\"FunktionStatus\", status - 90); //rücksetzen auf alten Status\n    msg.payload = item;\n    return [msg, null];\n}\n\n",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
@@ -967,7 +1008,7 @@
         "type": "debug",
         "z": "df2a5801fca17d05",
         "name": "debug 74",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -986,7 +1027,8 @@
         "name": "UpdateList",
         "mode": "link",
         "links": [
-            "72c67620ca1b4da0"
+            "72c67620ca1b4da0",
+            "be09463715c7c5de"
         ],
         "x": 1335,
         "y": 1160,
@@ -999,8 +1041,8 @@
         "name": "",
         "group": "b5196438b63bee02",
         "order": 9,
-        "width": 0,
-        "height": 0,
+        "width": 5,
+        "height": 1,
         "passthru": false,
         "label": "Info",
         "tooltip": "",
@@ -1013,7 +1055,7 @@
         "topic": "topic",
         "topicType": "msg",
         "x": 370,
-        "y": 2320,
+        "y": 2580,
         "wires": [
             [
                 "0a44b9f991a6eeee"
@@ -1027,10 +1069,11 @@
         "name": "link in 48",
         "links": [
             "1784357cdf144d36",
-            "c05bab02ca2774eb"
+            "c05bab02ca2774eb",
+            "39e5df2c5ffba1a7"
         ],
         "x": 145,
-        "y": 2320,
+        "y": 2580,
         "wires": [
             [
                 "ca5de6a795f6ac94"
@@ -1049,7 +1092,7 @@
         "finalize": "",
         "libs": [],
         "x": 550,
-        "y": 2320,
+        "y": 2580,
         "wires": [
             [
                 "caeadd440daf9b59",
@@ -1069,7 +1112,7 @@
         "finalize": "",
         "libs": [],
         "x": 250,
-        "y": 2240,
+        "y": 2500,
         "wires": [
             [
                 "a570939fa680b3b7"
@@ -1088,7 +1131,7 @@
         "finalize": "",
         "libs": [],
         "x": 250,
-        "y": 2280,
+        "y": 2540,
         "wires": [
             [
                 "f1d279e67f679107"
@@ -1107,7 +1150,7 @@
         "finalize": "",
         "libs": [],
         "x": 250,
-        "y": 2320,
+        "y": 2580,
         "wires": [
             [
                 "7aaf74ea058037ab"
@@ -1157,7 +1200,9 @@
             "cea0db56bce7c201",
             "4ce1c341573d9d3d",
             "05c19903a05675d3",
-            "95e168c7c06829a3"
+            "95e168c7c06829a3",
+            "26ab81678a0ae6ae",
+            "98e29492a9eeeb5d"
         ],
         "x": 235,
         "y": 1060,
@@ -1189,7 +1234,7 @@
         "type": "function",
         "z": "df2a5801fca17d05",
         "name": "function 72",
-        "func": "var msg2 = { payload: msg.payload.length };\nvar audio = {}\nvar status =flow.get(\"FunktionStatus\")\nvar unbekannterArtikel = {}\nvar item = msg.payload\n\n//Fehlerfall abfangen\nif (item.name.length<0??false)\n{\n  audio.payload=\"Es konnte keine Veränderung am Artikel durchgeführt werden.\"\n  return [null,audio]\n}\n\n\nif (status==1){\n  audio.payload=msg.payload.name + \" wurde hinzugefügt!\" \n  flow.set(\"SetArtikel\", { \"gtin\": msg.payload.gtin })\n  }\n\n\nif (status == 2) {\n  audio.payload = \"einmal \" + msg.payload.name + \" wurde entfernt!\"\n}\n\nif (typeof msg.payload.description != \"undefined\" && msg.payload.description.includes(\"Added by\")) {  \n  audio.payload = audio.payload + \" Artikel war nicht im Lager und wurde automatisch hinzugefügt, bitte prüfen.\"\n//&& (msg.payload.attributes[0].count == 1) - wenn die Ansage nur beim ersten mal erfolgen soll\n unbekannterArtikel.marked=true;\n unbekannterArtikel.gtin = msg.payload.gtin\n}\nflow.set(\"unbekannterArtikel\",unbekannterArtikel);\nmsg2.payload=item\nreturn [msg2,audio];",
+        "func": "var msg2 = { payload: msg.payload.length };\nvar audio = {}\nvar status =flow.get(\"FunktionStatus\")\nvar unbekannterArtikel = {}\nvar item = msg.payload\n\n//Fehlerfall abfangen\nif (item.name.length<0??false)\n{\n  audio.payload=\"Es konnte keine Veränderung am Artikel durchgeführt werden.\"\n  return [null,audio]\n}\n\nswitch (status) {\n  case 1:\n  audio.payload=msg.payload.name + \" wurde hinzugefügt!\" \n  flow.set(\"SetArtikel\", { \"gtin\": msg.payload.gtin })\n  break;\n\n  case 2:\n  audio.payload = \"einmal \" + msg.payload.name + \" wurde entfernt!\"\n  break;\n\n  case 51:\n  case 52:\n  case 53:\n    flow.set(\"FunktionStatus\", status - 50);\n    audio.payload = msg.payload.name + \" bestätigt!\"\n  break;\n  \n  case 61:\n  case 63:\n    flow.set(\"FunktionStatus\", status - 60);\n    // audio.payload = Set erfasst!\"\n  break;\n\n  case 71:\n  case 73:\n    flow.set(\"FunktionStatus\", status - 70);\n    // audio.payload = Gruppe vorbereitet!\"\n  break;\n\n  case 81:\n  case 83:\n    flow.set(\"FunktionStatus\", status - 80);\n    // audio.payload = Name angepasst!\"\n  break;\n\n  case 91:\n  case 93:\n    flow.set(\"FunktionStatus\", status - 90);\n    // audio.payload = Name angepasst!\"\n    break;\n\n}\n\n\n\n\n\n\nif (typeof msg.payload.description != \"undefined\" && msg.payload.description.includes(\"Added by\")) {  \n  audio.payload = audio.payload + \" Artikel automatisch hinzugefügt.\"\n//&& (msg.payload.attributes[0].count == 1) - wenn die Ansage nur beim ersten mal erfolgen soll\n unbekannterArtikel.marked=true;\n unbekannterArtikel.gtin = msg.payload.gtin\n}\nflow.set(\"unbekannterArtikel\",unbekannterArtikel);\nmsg2.payload=item\nreturn [msg2,audio];",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
@@ -1420,7 +1465,7 @@
         "z": "df2a5801fca17d05",
         "name": "",
         "group": "1ef0514ec8cc871c",
-        "order": 9,
+        "order": 8,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -1435,7 +1480,7 @@
         "topic": "topic",
         "topicType": "msg",
         "x": 400,
-        "y": 2360,
+        "y": 2620,
         "wires": [
             [
                 "7d156c4c271ec7a5"
@@ -1449,10 +1494,11 @@
         "name": "link in 50",
         "links": [
             "1784357cdf144d36",
-            "c05bab02ca2774eb"
+            "c05bab02ca2774eb",
+            "39e5df2c5ffba1a7"
         ],
         "x": 145,
-        "y": 2360,
+        "y": 2620,
         "wires": [
             [
                 "1f889b1f74b0eb7f"
@@ -1471,7 +1517,7 @@
         "finalize": "",
         "libs": [],
         "x": 570,
-        "y": 2360,
+        "y": 2620,
         "wires": [
             [
                 "c05bab02ca2774eb",
@@ -1491,7 +1537,7 @@
         "finalize": "",
         "libs": [],
         "x": 250,
-        "y": 2360,
+        "y": 2620,
         "wires": [
             [
                 "c8b6a6e18cf4fdf1"
@@ -1530,7 +1576,7 @@
         "voice": "Microsoft Katja - German (Germany)",
         "always": true,
         "x": 720,
-        "y": 1320,
+        "y": 1300,
         "wires": []
     },
     {
@@ -1770,7 +1816,7 @@
         "z": "df2a5801fca17d05",
         "name": "",
         "group": "1ef0514ec8cc871c",
-        "order": 4,
+        "order": 2,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -1784,11 +1830,12 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 180,
+        "x": 120,
         "y": 260,
         "wires": [
             [
-                "2db00ac1eca1fc5b"
+                "2db00ac1eca1fc5b",
+                "159fea5d214d8eaf"
             ]
         ]
     },
@@ -1801,7 +1848,7 @@
         "tooltip": "",
         "place": "Select option",
         "group": "1ef0514ec8cc871c",
-        "order": 7,
+        "order": 3,
         "width": 0,
         "height": 0,
         "passthru": true,
@@ -1891,7 +1938,8 @@
         "y": 300,
         "wires": [
             [
-                "b9bb4e8c36940aa7"
+                "b9bb4e8c36940aa7",
+                "9e8fa91071c52c3d"
             ]
         ]
     },
@@ -1980,7 +2028,8 @@
         "name": "Tabellefuellen",
         "mode": "link",
         "links": [
-            "1bd9ff15d61b2b85"
+            "1bd9ff15d61b2b85",
+            "be09463715c7c5de"
         ],
         "x": 1315,
         "y": 1520,
@@ -1993,9 +2042,10 @@
         "name": "Linkout GetStock Item",
         "mode": "link",
         "links": [
+            "6f286af48641b8ed",
             "72c67620ca1b4da0",
             "ac2f7e0c75ed11da",
-            "6f286af48641b8ed"
+            "be09463715c7c5de"
         ],
         "x": 765,
         "y": 1060,
@@ -2038,10 +2088,10 @@
         "type": "ui_button",
         "z": "df2a5801fca17d05",
         "name": "",
-        "group": "1ef0514ec8cc871c",
-        "order": 8,
-        "width": 0,
-        "height": 0,
+        "group": "b5196438b63bee02",
+        "order": 12,
+        "width": 5,
+        "height": 1,
         "passthru": true,
         "label": "Artikel korrekt bestätigen",
         "tooltip": "",
@@ -2054,7 +2104,7 @@
         "topic": "topic",
         "topicType": "msg",
         "x": 230,
-        "y": 2180,
+        "y": 2300,
         "wires": [
             [
                 "0b129c9208120773"
@@ -2071,7 +2121,7 @@
             "2778894f96a9a232"
         ],
         "x": 685,
-        "y": 2180,
+        "y": 2300,
         "wires": []
     },
     {
@@ -2079,20 +2129,20 @@
         "type": "function",
         "z": "df2a5801fca17d05",
         "name": "Artikel bestätigen",
-        "func": "if (msg.payload != \"ArtikelOk\") {\n    return [null, null]\n}\n\nvar unbekannterArtikel = flow.get(\"unbekannterArtikel\")\nvar audio ={}\nif (unbekannterArtikel.marked??false){\n    msg.gtin=unbekannterArtikel.gtin\n}else\n{\n    audio.payload=\"Der Artikel wurde nicht als unbekannt markiert und kann daher nicht bestätigt werden\"\nreturn [null, audio]\n}\nvar status = flow.get(\"FunktionStatus\");\n\n    switch (status) {\n        case 1:\n            flow.set(\"FunktionStatus\",51)\n            audio.payload = \"Artikel wird bestätigt\";\n            break;\n        case 2:\n            flow.set(\"FunktionStatus\", 52)\n            audio.payload = \"Artikel wird bestätigt\";\n            break;\n        case 3:\n            flow.set(\"FunktionStatus\", 53)\n            audio.payload = \"Artikel wird bestätigt\";\n            break;\n        case 4:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Löschen kann ein Artikel nicht bestätigt werden\";\n            break;\n        default:\n            audio.payload = \"Es wurde kein Status erkannt \" + status;\n    }\n\nreturn [msg, audio];",
+        "func": "if (msg.payload != \"ArtikelOk\") {\n    return [null, null]\n}\n\nvar unbekannterArtikel = flow.get(\"unbekannterArtikel\")\nvar audio ={}\nif (unbekannterArtikel.marked??false){\n    msg.gtin=unbekannterArtikel.gtin\n}else\n{\n    audio.payload=\"Der Artikel wurde nicht als unbekannt markiert und kann daher nicht bestätigt werden\"\nreturn [null, audio]\n}\nvar status = flow.get(\"FunktionStatus\");\n\n    switch (status) {\n        case 1:\n            flow.set(\"FunktionStatus\",51)\n            audio = null;\n            break;\n        case 2:\n            flow.set(\"FunktionStatus\", 52)\n            audio = null;\n            break;\n        case 3:\n            flow.set(\"FunktionStatus\", 53)\n            audio = null;\n            break;\n        case 4:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Löschen kann ein Artikel nicht bestätigt werden\";\n            break;\n        default:\n            audio.payload = \"Es wurde kein Status erkannt \" + status;\n    }\n\nreturn [msg, audio];",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
         "x": 510,
-        "y": 2180,
+        "y": 2300,
         "wires": [
             [
                 "cea0db56bce7c201"
             ],
             [
-                "caeadd440daf9b59"
+                "a184ec14b1c75614"
             ]
         ]
     },
@@ -2101,10 +2151,10 @@
         "type": "ui_button",
         "z": "df2a5801fca17d05",
         "name": "",
-        "group": "1ef0514ec8cc871c",
-        "order": 8,
-        "width": 0,
-        "height": 0,
+        "group": "b5196438b63bee02",
+        "order": 11,
+        "width": 5,
+        "height": 1,
         "passthru": false,
         "label": "Als Set deklarieren",
         "tooltip": "",
@@ -2117,7 +2167,7 @@
         "topic": "topic",
         "topicType": "msg",
         "x": 210,
-        "y": 2140,
+        "y": 2240,
         "wires": [
             [
                 "f7e72db3f50cb356"
@@ -2133,8 +2183,8 @@
         "links": [
             "2778894f96a9a232"
         ],
-        "x": 685,
-        "y": 2140,
+        "x": 1685,
+        "y": 2240,
         "wires": []
     },
     {
@@ -2142,20 +2192,21 @@
         "type": "function",
         "z": "df2a5801fca17d05",
         "name": "Artikel Set",
-        "func": "if (msg.payload != \"Set\") {\n    return [null, null]\n}\n\nvar setArtikel = flow.get(\"SetArtikel\")\nvar audio = {}\nif (setArtikel.gtin!=0??false){\n    msg.gtin=setArtikel.gtin\n}else\n{\n    audio.payload=\"Der letzte Artikel wurde nicht richtig erkannt bitte erneut scannen\"\n    flow.set(\"FunktionStatus\", 3)\nreturn [null, audio]\n}\nvar status = flow.get(\"FunktionStatus\");\n\n    switch (status) {\n        case 1:\n            flow.set(\"FunktionStatus\",61)\n            audio.payload=\"Set wird angelegt muss angepasst werden\";\n            break;\n        case 2:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Ausgabe können keine Sets erfasst werden, wechsel auf Info\";\n            break;\n        case 3:\n            flow.set(\"FunktionStatus\", 63)\n            audio.payload = \"Set wird angelegt muss angepasst werden\";\n            break;\n        case 4:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Löschen können keine Sets erfasst werden, wechsel auf Info\";\n            break;\n        default:\n            audio.payload = \"Es wurde kein Status erkannt\";\n            return[null, audio];\n    }\n\nreturn [msg, audio];",
+        "func": "if (msg.payload != \"Set\") {\n    return [null, null]\n}\n\nvar setArtikel = flow.get(\"SetArtikel\")\nvar audio = {}\nif (setArtikel.gtin!=0??false){\n    msg.gtin=setArtikel.gtin\n}else\n{\n    audio.payload=\"Der letzte Artikel wurde nicht richtig erkannt bitte erneut scannen\"\n    msg=null;\n    flow.set(\"FunktionStatus\", 3)\nreturn [null, audio]\n}\nvar status = flow.get(\"FunktionStatus\");\n\n    switch (status) {\n        case 1:\n            flow.set(\"FunktionStatus\",61)\n            audio.payload =\"Bitte das im Set enthaltene Produkt scannen\";\n            msg.payload = \"Bitte das im Set enthaltene Produkt scannen!\"\n            break;\n        case 2:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Ausgabe können keine Sets erfasst werden, wechsel auf Info\";\n            msg = null;\n            break;\n        case 3:\n            flow.set(\"FunktionStatus\", 63)\n            audio.payload = \"Bitte das im Set enthaltene Produkt scannen\";\n            msg.payload=\"Bitte das im Set enthaltene Produkt scannen!\"\n            break;\n        case 4:\n            flow.set(\"FunktionStatus\", 3)\n            msg = null;\n            audio.payload = \"Im Status Löschen können keine Sets erfasst werden, wechsel auf Info\";\n            break;\n        default:\n            audio.payload = \"Es wurde kein Status erkannt\";\n            return[null, audio];\n    }\n\nreturn [msg, audio];",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
         "x": 490,
-        "y": 2140,
+        "y": 2240,
         "wires": [
             [
-                "4ce1c341573d9d3d"
+                "800c139e20f8408e",
+                "2c13cf6045cee8bf"
             ],
             [
-                "caeadd440daf9b59"
+                "5830169560435c3d"
             ]
         ]
     },
@@ -2219,7 +2270,7 @@
         "z": "df2a5801fca17d05",
         "name": "",
         "group": "1ef0514ec8cc871c",
-        "order": 8,
+        "order": 9,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -2234,7 +2285,7 @@
         "topic": "topic",
         "topicType": "msg",
         "x": 250,
-        "y": 2100,
+        "y": 2160,
         "wires": [
             [
                 "2bf03c1f464a6bbf"
@@ -2251,28 +2302,28 @@
             "2778894f96a9a232"
         ],
         "x": 685,
-        "y": 2100,
+        "y": 2160,
         "wires": []
     },
     {
         "id": "2bf03c1f464a6bbf",
         "type": "function",
         "z": "df2a5801fca17d05",
-        "name": "Artikel Set",
-        "func": "if (msg.payload!=\"Gruppe\"){\n    return [null, null]\n}\n\nvar setArtikel = flow.get(\"SetArtikel\")\nvar audio = {}\nif (setArtikel.gtin != 0 ?? false) {\n    msg.gtin = setArtikel.gtin\n} else {\n    audio.payload = \"Der letzte Artikel wurde nicht richtig erkannt bitte erneut scannen\"\n    flow.set(\"FunktionStatus\", 3)\n    return [null, audio]\n}\n\nvar status = flow.get(\"FunktionStatus\");\n\n    switch (status) {\n        case 1:\n            flow.set(\"FunktionStatus\",71)\n            audio.payload=\"Gruppenzuordnung wird vorbereiet, muss angepasst werden\";\n            break;\n        case 2:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Ausgabe kann keine Gruppenvorbereitung durchgeführt werden, wechsel auf Info\";\n            break;\n        case 3:\n            flow.set(\"FunktionStatus\", 73)\n            audio.payload = \"Gruppenzuordnung wird vorbereiet, muss angepasst werden\";\n            break;\n        case 4:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Löschen kann keine Gruppenvorbereitung durchgeführt werden, wechsel auf Info\";\n            break;\n        default:\n            audio.payload = \"Es wurde kein Status erkannt\";\n            return[null, audio];\n    }\n\nreturn [msg, audio];",
+        "name": "Artikel zu Gruppe",
+        "func": "if (msg.payload!=\"Gruppe\"){\n    return [null, null]\n}\n\nvar setArtikel = flow.get(\"SetArtikel\")\nvar audio = {}\nif (setArtikel.gtin != 0 ?? false) {\n    msg.gtin = setArtikel.gtin\n} else {\n    audio.payload = \"Der letzte Artikel wurde nicht richtig erkannt bitte erneut scannen\"\n    flow.set(\"FunktionStatus\", 3)\n    return [null, audio]\n}\n\nvar status = flow.get(\"FunktionStatus\");\n\n    switch (status) {\n        case 1:\n            flow.set(\"FunktionStatus\",71)\n            //audio.payload=\"Gruppenzuordnung wird vorbereiet, muss angepasst werden\";\n            audio = null;\n            break;\n        case 2:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Ausgabe kann keine Gruppenvorbereitung durchgeführt werden, wechsel auf Info\";\n            break;\n        case 3:\n            flow.set(\"FunktionStatus\", 73)\n            //audio.payload = \"Gruppenzuordnung wird vorbereiet, muss angepasst werden\";\n            audio = null;\n            break;\n        case 4:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Löschen kann keine Gruppenvorbereitung durchgeführt werden, wechsel auf Info\";\n            break;\n        default:\n            audio.payload = \"Es wurde kein Status erkannt\";\n            return[null, audio];\n    }\n\nreturn [msg, audio];",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 510,
-        "y": 2100,
+        "x": 530,
+        "y": 2160,
         "wires": [
             [
                 "95e168c7c06829a3"
             ],
             [
-                "caeadd440daf9b59"
+                "fc1cb5f74f041874"
             ]
         ]
     },
@@ -2282,10 +2333,11 @@
         "z": "df2a5801fca17d05",
         "name": "link in 54",
         "links": [
-            "1784357cdf144d36"
+            "1784357cdf144d36",
+            "39e5df2c5ffba1a7"
         ],
-        "x": 385,
-        "y": 2060,
+        "x": 365,
+        "y": 2000,
         "wires": [
             [
                 "2bf03c1f464a6bbf",
@@ -2312,6 +2364,1063 @@
         "x": 1210,
         "y": 1780,
         "wires": []
+    },
+    {
+        "id": "ffb9e08989cb7667",
+        "type": "comment",
+        "z": "df2a5801fca17d05",
+        "name": "ToDo",
+        "info": "\n",
+        "x": 210,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "1e1a25e8f1c58a31",
+        "type": "ui_ui_control",
+        "z": "df2a5801fca17d05",
+        "name": "",
+        "events": "change",
+        "x": 680,
+        "y": 2800,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2d27306baf7a8f92",
+        "type": "function",
+        "z": "df2a5801fca17d05",
+        "name": "function 78",
+        "func": "msg = { payload: { \"group\": { \"close\": [\"Speisekammer_Standard\"] } } }\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 2720,
+        "wires": [
+            [
+                "1e1a25e8f1c58a31"
+            ]
+        ]
+    },
+    {
+        "id": "e856cd09cce9ac2b",
+        "type": "function",
+        "z": "df2a5801fca17d05",
+        "name": "function 79",
+        "func": "msg = { payload: { \"group\": { \"open\": [\"Speisekammer_Standard\"] } } }\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 2800,
+        "wires": [
+            [
+                "1e1a25e8f1c58a31"
+            ]
+        ]
+    },
+    {
+        "id": "1bf01b0454031b46",
+        "type": "ui_button",
+        "z": "df2a5801fca17d05",
+        "name": "",
+        "group": "1ef0514ec8cc871c",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Close Group",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 210,
+        "y": 2720,
+        "wires": [
+            [
+                "2d27306baf7a8f92"
+            ]
+        ]
+    },
+    {
+        "id": "18fadc35b6feb37f",
+        "type": "ui_button",
+        "z": "df2a5801fca17d05",
+        "name": "",
+        "group": "1ef0514ec8cc871c",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Open Group",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 210,
+        "y": 2800,
+        "wires": [
+            [
+                "e856cd09cce9ac2b"
+            ]
+        ]
+    },
+    {
+        "id": "9ab6c40d47fad3b8",
+        "type": "link in",
+        "z": "df2a5801fca17d05",
+        "name": "close Group",
+        "links": [
+            "159fea5d214d8eaf",
+            "800c139e20f8408e",
+            "2984632e760a14e1",
+            "c0210d205919ea33"
+        ],
+        "x": 315,
+        "y": 2700,
+        "wires": [
+            [
+                "2d27306baf7a8f92"
+            ]
+        ]
+    },
+    {
+        "id": "d6d55d1f13296d80",
+        "type": "link in",
+        "z": "df2a5801fca17d05",
+        "name": "open Group",
+        "links": [
+            "9e8fa91071c52c3d",
+            "2b2d812e233ec7c4",
+            "06f821e9ca9291a7",
+            "c080e469adafc3fc"
+        ],
+        "x": 315,
+        "y": 2760,
+        "wires": [
+            [
+                "e856cd09cce9ac2b"
+            ]
+        ]
+    },
+    {
+        "id": "159fea5d214d8eaf",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "link out 2",
+        "mode": "link",
+        "links": [
+            "9ab6c40d47fad3b8"
+        ],
+        "x": 245,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "9e8fa91071c52c3d",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "link out 3",
+        "mode": "link",
+        "links": [
+            "d6d55d1f13296d80"
+        ],
+        "x": 505,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "1fb1abb0ebfab187",
+        "type": "ui_button",
+        "z": "df2a5801fca17d05",
+        "d": true,
+        "name": "",
+        "group": "1ef0514ec8cc871c",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Produktname ändern",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "{{msg.bgcolor}}",
+        "className": "",
+        "icon": "",
+        "payload": "Name",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 220,
+        "y": 2120,
+        "wires": [
+            [
+                "cd40a1f8438409f4"
+            ]
+        ]
+    },
+    {
+        "id": "26ab81678a0ae6ae",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "hole Artikel",
+        "mode": "link",
+        "links": [
+            "2778894f96a9a232"
+        ],
+        "x": 1375,
+        "y": 2100,
+        "wires": []
+    },
+    {
+        "id": "cd40a1f8438409f4",
+        "type": "function",
+        "z": "df2a5801fca17d05",
+        "name": "Artikel Name ändern",
+        "func": "if (msg.payload!=\"Name\"){  // beenden wenn die Scanner Funktion nicht die richtige ist\n    return [null, null]\n}\n\nvar setArtikel = flow.get(\"SetArtikel\")\nvar audio = {}\nif (setArtikel.gtin != 0 ?? false) {\n    msg.gtin = setArtikel.gtin\n} else {\n    audio.payload = \"Der letzte Artikel wurde nicht richtig erkannt bitte erneut scannen\"\n    flow.set(\"FunktionStatus\", 3)\n    return [null, audio]\n}\n\nvar status = flow.get(\"FunktionStatus\");\n\n    switch (status) {\n        case 1:\n            flow.set(\"FunktionStatus\",81)\n            audio.payload=\"Bitte neuen Namen eingeben\";\n            msg.payload = \"Bitte neuen Namen eingeben\";\n            break;\n        case 2:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Ausgabe kann der Name nicht verändert werden, wechsel auf Info\";\n            msg = null\n            break;\n        case 3:\n            flow.set(\"FunktionStatus\", 83)\n            audio.payload = \"Bitte neuen Namen eingeben\";\n            msg.payload = \"Bitte neuen Namen eingeben\";\n            break;\n        case 4:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Löschen kann der Name nicht verändert werden, wechsel auf Info\";\n            msg = null;\n            break;\n        default:\n            audio.payload = \"Es wurde kein Status erkannt\";\n            return[null, audio];\n    }\n\nreturn [msg, audio];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 2120,
+        "wires": [
+            [
+                "2984632e760a14e1",
+                "7732eeb6bdaab177"
+            ],
+            [
+                "e63a2230f50d963e"
+            ]
+        ]
+    },
+    {
+        "id": "800c139e20f8408e",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "link out 4",
+        "mode": "link",
+        "links": [
+            "9ab6c40d47fad3b8"
+        ],
+        "x": 655,
+        "y": 2220,
+        "wires": []
+    },
+    {
+        "id": "cd6ada510aacda5a",
+        "type": "ui_toast",
+        "z": "df2a5801fca17d05",
+        "position": "prompt",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Cancel",
+        "raw": false,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 980,
+        "y": 2240,
+        "wires": [
+            [
+                "b20997f290417209"
+            ]
+        ]
+    },
+    {
+        "id": "b20997f290417209",
+        "type": "function",
+        "z": "df2a5801fca17d05",
+        "name": "Save Set GTIN",
+        "func": "if (msg.payload== \"Cancel\"){\n    return null;\n}\n\nflow.set(\"SetGTIN\", msg.payload)\nmsg.payload = \"Anzahl Artikel im Set?\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1170,
+        "y": 2240,
+        "wires": [
+            [
+                "f3aad6911a39d1c1"
+            ]
+        ]
+    },
+    {
+        "id": "2cacac32031ddb12",
+        "type": "ui_toast",
+        "z": "df2a5801fca17d05",
+        "position": "prompt",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Cancel",
+        "raw": false,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 1010,
+        "y": 2100,
+        "wires": [
+            [
+                "8f8b6d27da8a5429"
+            ]
+        ]
+    },
+    {
+        "id": "8f8b6d27da8a5429",
+        "type": "function",
+        "z": "df2a5801fca17d05",
+        "name": "Save New Name",
+        "func": "if (msg.payload == \"Cancel\") {\n    return null;\n}\n\nvar setArtikel = flow.get(\"SetArtikel\")\n\nif (setArtikel.gtin != 0 ?? false) {\n    msg.gtin = setArtikel.gtin\n}\n\nflow.set(\"NewName\", msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1210,
+        "y": 2100,
+        "wires": [
+            [
+                "26ab81678a0ae6ae",
+                "06f821e9ca9291a7",
+                "65fea47b86686043"
+            ]
+        ]
+    },
+    {
+        "id": "2984632e760a14e1",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "link out 5",
+        "mode": "link",
+        "links": [
+            "9ab6c40d47fad3b8"
+        ],
+        "x": 685,
+        "y": 2060,
+        "wires": []
+    },
+    {
+        "id": "06f821e9ca9291a7",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "link out 6",
+        "mode": "link",
+        "links": [
+            "d6d55d1f13296d80"
+        ],
+        "x": 1385,
+        "y": 2060,
+        "wires": []
+    },
+    {
+        "id": "2b2d812e233ec7c4",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "link out 7",
+        "mode": "link",
+        "links": [
+            "d6d55d1f13296d80"
+        ],
+        "x": 1685,
+        "y": 2200,
+        "wires": []
+    },
+    {
+        "id": "f3aad6911a39d1c1",
+        "type": "ui_toast",
+        "z": "df2a5801fca17d05",
+        "position": "prompt",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Cancel",
+        "raw": false,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 1340,
+        "y": 2240,
+        "wires": [
+            [
+                "3a496b1a04d822c4"
+            ]
+        ]
+    },
+    {
+        "id": "3a496b1a04d822c4",
+        "type": "function",
+        "z": "df2a5801fca17d05",
+        "name": "Save Item Anzahl",
+        "func": "if (msg.payload == \"Cancel\") {\n    return null;\n}\n\nflow.set(\"SetItemAnzahl\", msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1520,
+        "y": 2240,
+        "wires": [
+            [
+                "2b2d812e233ec7c4"
+            ]
+        ]
+    },
+    {
+        "id": "7732eeb6bdaab177",
+        "type": "delay",
+        "z": "df2a5801fca17d05",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 800,
+        "y": 2100,
+        "wires": [
+            [
+                "2cacac32031ddb12"
+            ]
+        ]
+    },
+    {
+        "id": "2c13cf6045cee8bf",
+        "type": "delay",
+        "z": "df2a5801fca17d05",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 780,
+        "y": 2240,
+        "wires": [
+            [
+                "cd6ada510aacda5a"
+            ]
+        ]
+    },
+    {
+        "id": "4d43fb2819e22d91",
+        "type": "debug",
+        "z": "df2a5801fca17d05",
+        "name": "debug 93",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1380,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "b4b8f8b72a1bb034",
+        "type": "inject",
+        "z": "df2a5801fca17d05",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 620,
+        "wires": [
+            [
+                "91bef64683715b98"
+            ]
+        ]
+    },
+    {
+        "id": "f157011fd5c80a1b",
+        "type": "ui_text",
+        "z": "df2a5801fca17d05",
+        "group": "b5196438b63bee02",
+        "order": 8,
+        "width": 9,
+        "height": 3,
+        "name": "",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "col-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1530,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "b3468a4c529ad293",
+        "type": "function",
+        "z": "df2a5801fca17d05",
+        "name": "function 80",
+        "func": "msg.payload = (\"Name: \" + msg.payload.Name + \"<br/>\" + \" Barcode: \" + msg.payload.Barcode + \"<br/>\" + \" Anzahl: \" + msg.payload.Anzahl + \"<br/>\" + \" Beschreibung: \"+msg.payload.Beschreibung)??\"-\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1370,
+        "y": 880,
+        "wires": [
+            [
+                "f157011fd5c80a1b"
+            ]
+        ]
+    },
+    {
+        "id": "65fea47b86686043",
+        "type": "debug",
+        "z": "df2a5801fca17d05",
+        "name": "debug 94",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1440,
+        "y": 2140,
+        "wires": []
+    },
+    {
+        "id": "e63a2230f50d963e",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "link out 8",
+        "mode": "link",
+        "links": [
+            "119222b615eab0c7",
+            "be09463715c7c5de"
+        ],
+        "x": 735,
+        "y": 2140,
+        "wires": []
+    },
+    {
+        "id": "119222b615eab0c7",
+        "type": "link in",
+        "z": "df2a5801fca17d05",
+        "name": "audio",
+        "links": [
+            "e63a2230f50d963e",
+            "fc1cb5f74f041874",
+            "5830169560435c3d",
+            "a184ec14b1c75614",
+            "47690345ef778ea7"
+        ],
+        "x": 685,
+        "y": 2680,
+        "wires": [
+            [
+                "caeadd440daf9b59"
+            ]
+        ]
+    },
+    {
+        "id": "fc1cb5f74f041874",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "link out 9",
+        "mode": "link",
+        "links": [
+            "119222b615eab0c7",
+            "be09463715c7c5de"
+        ],
+        "x": 725,
+        "y": 2180,
+        "wires": []
+    },
+    {
+        "id": "5830169560435c3d",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "link out 10",
+        "mode": "link",
+        "links": [
+            "119222b615eab0c7",
+            "be09463715c7c5de"
+        ],
+        "x": 655,
+        "y": 2260,
+        "wires": []
+    },
+    {
+        "id": "a184ec14b1c75614",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "link out 11",
+        "mode": "link",
+        "links": [
+            "119222b615eab0c7",
+            "be09463715c7c5de"
+        ],
+        "x": 685,
+        "y": 2340,
+        "wires": []
+    },
+    {
+        "id": "ac95987c284ca714",
+        "type": "function",
+        "z": "df2a5801fca17d05",
+        "name": "Artikel Name ändern",
+        "func": "if (msg.payload!=\"Hinweis\"){  // beenden wenn die Scanner Funktion nicht die richtige ist\n    return [null, null]\n}\n\nvar setArtikel = flow.get(\"SetArtikel\")\nvar audio = {}\nif (setArtikel.gtin != 0 ?? false) {\n    msg.gtin = setArtikel.gtin\n} else {\n    audio.payload = \"Der letzte Artikel wurde nicht richtig erkannt bitte erneut scannen\"\n    flow.set(\"FunktionStatus\", 3)\n    return [null, audio]\n}\n\nvar status = flow.get(\"FunktionStatus\");\n\n    switch (status) {\n        case 1:\n            flow.set(\"FunktionStatus\",91)\n            audio.payload=\"Bitte Hinweis eingeben\";\n            msg.payload = \"Bitte Hinweis eingeben\";\n            break;\n        case 2:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Ausgabe kann der Name nicht verändert werden, wechsel auf Info\";\n            msg = null\n            break;\n        case 3:\n            flow.set(\"FunktionStatus\", 93)\n            audio.payload = \"Bitte Hinweis eingeben\";\n            msg.payload = \"Bitte Hinweis eingeben\";\n            break;\n        case 4:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Löschen kann der Name nicht verändert werden, wechsel auf Info\";\n            msg = null;\n            break;\n        default:\n            audio.payload = \"Es wurde kein Status erkannt\";\n            return[null, audio];\n    }\n\nreturn [msg, audio];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 2420,
+        "wires": [
+            [
+                "c0210d205919ea33",
+                "f1ccb73b40ab4e6c"
+            ],
+            [
+                "47690345ef778ea7"
+            ]
+        ]
+    },
+    {
+        "id": "4d6a3ca40fc55c25",
+        "type": "ui_button",
+        "z": "df2a5801fca17d05",
+        "name": "",
+        "group": "b5196438b63bee02",
+        "order": 10,
+        "width": 5,
+        "height": 1,
+        "passthru": false,
+        "label": "Hinweis hinzufügen",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "{{msg.bgcolor}}",
+        "className": "",
+        "icon": "",
+        "payload": "Hinweis",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 210,
+        "y": 2420,
+        "wires": [
+            [
+                "ac95987c284ca714"
+            ]
+        ]
+    },
+    {
+        "id": "c0210d205919ea33",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "link out 12",
+        "mode": "link",
+        "links": [
+            "9ab6c40d47fad3b8"
+        ],
+        "x": 755,
+        "y": 2360,
+        "wires": []
+    },
+    {
+        "id": "f1ccb73b40ab4e6c",
+        "type": "delay",
+        "z": "df2a5801fca17d05",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 800,
+        "y": 2400,
+        "wires": [
+            [
+                "fca7a251a6f66586"
+            ]
+        ]
+    },
+    {
+        "id": "47690345ef778ea7",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "link out 13",
+        "mode": "link",
+        "links": [
+            "119222b615eab0c7",
+            "be09463715c7c5de"
+        ],
+        "x": 735,
+        "y": 2440,
+        "wires": []
+    },
+    {
+        "id": "fca7a251a6f66586",
+        "type": "ui_toast",
+        "z": "df2a5801fca17d05",
+        "position": "prompt",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Cancel",
+        "raw": false,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 1010,
+        "y": 2400,
+        "wires": [
+            [
+                "cba5e597751016bf"
+            ]
+        ]
+    },
+    {
+        "id": "cba5e597751016bf",
+        "type": "function",
+        "z": "df2a5801fca17d05",
+        "name": "Save New Name",
+        "func": "if (msg.payload == \"Cancel\") {\n    return null;\n}\n\nvar setArtikel = flow.get(\"SetArtikel\")\n\nif (setArtikel.gtin != 0 ?? false) {\n    msg.gtin = setArtikel.gtin\n}\n\nflow.set(\"New_Description\", msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1210,
+        "y": 2400,
+        "wires": [
+            [
+                "98e29492a9eeeb5d",
+                "c080e469adafc3fc",
+                "2ca0b11e428d742c"
+            ]
+        ]
+    },
+    {
+        "id": "98e29492a9eeeb5d",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "hole Artikel",
+        "mode": "link",
+        "links": [
+            "2778894f96a9a232"
+        ],
+        "x": 1375,
+        "y": 2400,
+        "wires": []
+    },
+    {
+        "id": "c080e469adafc3fc",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "link out 14",
+        "mode": "link",
+        "links": [
+            "d6d55d1f13296d80"
+        ],
+        "x": 1385,
+        "y": 2360,
+        "wires": []
+    },
+    {
+        "id": "2ca0b11e428d742c",
+        "type": "debug",
+        "z": "df2a5801fca17d05",
+        "name": "debug 95",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1440,
+        "y": 2440,
+        "wires": []
+    },
+    {
+        "id": "9a7da65ddbc174d8",
+        "type": "delay",
+        "z": "df2a5801fca17d05",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "15",
+        "timeoutUnits": "minutes",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 750,
+        "y": 2960,
+        "wires": [
+            [
+                "59fa991e4e4da815"
+            ]
+        ]
+    },
+    {
+        "id": "9c8af37a61cf12b0",
+        "type": "function",
+        "z": "df2a5801fca17d05",
+        "name": "function 81",
+        "func": "msg={}\nmsg.payload=true;\nmsg.reset=true;\nvar msg2 = {}\nmsg2.payload= true;\nreturn [msg, msg2] ;",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 2960,
+        "wires": [
+            [
+                "9a7da65ddbc174d8"
+            ],
+            [
+                "2c543fb22c5ef024"
+            ]
+        ]
+    },
+    {
+        "id": "59fa991e4e4da815",
+        "type": "function",
+        "z": "df2a5801fca17d05",
+        "name": "function 82",
+        "func": "var status = flow.get(\"FunktionStatus\") || 0;\n\nif (status==2){\n    return null\n}\n\nflow.set(\"FunktionStatus\", 2)\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 2960,
+        "wires": [
+            [
+                "39e5df2c5ffba1a7"
+            ]
+        ]
+    },
+    {
+        "id": "39e5df2c5ffba1a7",
+        "type": "link out",
+        "z": "df2a5801fca17d05",
+        "name": "EingabeButton2",
+        "mode": "link",
+        "links": [
+            "fddc574b7f180e59",
+            "85287d42b5670ae4",
+            "cf8154f797aa603b",
+            "add4c0b1fee25743",
+            "01f4172636923fda",
+            "9f5b10e528bf8f3d",
+            "9eddf93a5405bceb",
+            "105f2e5dca58032a"
+        ],
+        "x": 1155,
+        "y": 2960,
+        "wires": []
+    },
+    {
+        "id": "be09463715c7c5de",
+        "type": "link in",
+        "z": "df2a5801fca17d05",
+        "name": "reset Status 2",
+        "links": [
+            "c05bab02ca2774eb",
+            "539c949eae500ef8",
+            "fa600f9d8a69c97a",
+            "e292d5660da60ad7",
+            "47690345ef778ea7",
+            "a184ec14b1c75614",
+            "5830169560435c3d",
+            "fc1cb5f74f041874",
+            "e63a2230f50d963e"
+        ],
+        "x": 145,
+        "y": 3000,
+        "wires": [
+            [
+                "9c8af37a61cf12b0"
+            ]
+        ]
+    },
+    {
+        "id": "ec968c3e88d051be",
+        "type": "comment",
+        "z": "df2a5801fca17d05",
+        "name": "Reset \"Ausgabe\"",
+        "info": "",
+        "x": 200,
+        "y": 2880,
+        "wires": []
+    },
+    {
+        "id": "2c543fb22c5ef024",
+        "type": "delay",
+        "z": "df2a5801fca17d05",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 500,
+        "y": 3000,
+        "wires": [
+            [
+                "9a7da65ddbc174d8"
+            ]
+        ]
+    },
+    {
+        "id": "28d3e695fb989200",
+        "type": "inject",
+        "z": "df2a5801fca17d05",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "10",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 2940,
+        "wires": [
+            [
+                "9c8af37a61cf12b0"
+            ]
+        ]
+    },
+    {
+        "id": "a59a9109406b9cc9",
+        "type": "inject",
+        "z": "df2a5801fca17d05",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 750,
+        "y": 2920,
+        "wires": [
+            [
+                "59fa991e4e4da815"
+            ]
+        ]
+    },
+    {
+        "id": "73cbadd25acedd71",
+        "type": "ui_spacer",
+        "z": "df2a5801fca17d05",
+        "name": "spacer",
+        "group": "1ef0514ec8cc871c",
+        "order": 6,
+        "width": 6,
+        "height": 1
     },
     {
         "id": "b5196438b63bee02",
