@@ -28,5 +28,5 @@ Sets darf man sich wie einen 6er Wasser vorstellen. Diese sog. Sets haben eigene
 Gruppen können Artikel zusammen fassen. Zum Beispiel Spagetti, Makaroni und Spirelli zu Nudeln. Hierdurch lassen sich besser Mindestmengen definieren. Achtung! Gruppen müssen derzeit noch manuell in der Speisekammer App administriert werden. Sie müssen immer im Lagerort Gruppen abgelegt werden. Die Barcodes hierfür müssen manuell vergeben und in die einzelnen Gruppenartiekel eingetragen werden.
 Zur besseren Übersicht beginnen die Barcodes für Gruppen bei mir mit "G".
 
-#Inventur
+# Inventur
 Planung und Realität sind oft nicht das selbe insofern ist eine Inventur sicher sinnvoll. Einfach alle Artikel scannen und hinterher einen Vergleich zwischen Soll und Ist durchfürhen.
