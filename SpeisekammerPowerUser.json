@@ -43,7 +43,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1590,
+        "x": 1630,
         "y": 540,
         "wires": [
             []
@@ -190,7 +190,7 @@
         "type": "debug",
         "z": "1ffe3e95ef0562db",
         "name": "debug 63",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -327,7 +327,7 @@
         "type": "function",
         "z": "1ffe3e95ef0562db",
         "name": "Check Barcode",
-        "func": "\n\n\nmsg.gtin=msg.payload\n\n\nswitch (msg.payload[0]) {\n    case \"$\":\n\n        return [null, msg, null]\n   \n    case \"#\":\n        return [null, null, msg]\n    \n    case \"-\":\n        if (msg.payload.length != 8 ) {\n            return [msg, null, null]\n        }\n      break\n\n    default:\n        if (msg.payload.length > 8 || msg.payload.length < 13) {\n            return [msg, null, null]\n        }\n        break\n        \n\n}\n\n",
+        "func": "\n\n\nmsg.gtin=msg.payload\n\n\nswitch (msg.payload[0]) {\n    case \"$\":\n\n        return [null, msg, null]\n   \n    case \"#\":\n        return [null, null, msg]\n    \n    case \"-\":\n        if (msg.payload.length != 8 ) {\n            return [msg, null, null]\n        }\n      break\n\n    default:\n        if (msg.payload.length > 8 && msg.payload.length < 14) {\n            return [msg, null, null]\n        }\n        break\n        \n\n}\n\n",
         "outputs": 3,
         "noerr": 0,
         "initialize": "",
@@ -377,7 +377,7 @@
         "z": "1ffe3e95ef0562db",
         "name": "",
         "group": "b5196438b63bee02",
-        "order": 6,
+        "order": 10,
         "width": 5,
         "height": 1,
         "passthru": false,
@@ -405,7 +405,7 @@
         "z": "1ffe3e95ef0562db",
         "name": "",
         "group": "b5196438b63bee02",
-        "order": 9,
+        "order": 6,
         "width": 5,
         "height": 1,
         "passthru": false,
@@ -754,7 +754,8 @@
             "01f4172636923fda",
             "852a052dbffc2899",
             "15e3437555f9baf9",
-            "00876abb69010a2a"
+            "00876abb69010a2a",
+            "1f46869b22fbca64"
         ],
         "x": 775,
         "y": 2560,
@@ -779,7 +780,8 @@
             ],
             [
                 "7445c97121efd05e",
-                "0c27a57a1e0bb31a"
+                "0c27a57a1e0bb31a",
+                "50ed66269a97a6c5"
             ],
             [
                 "acd0c61d716ee707",
@@ -897,7 +899,7 @@
         "type": "function",
         "z": "1ffe3e95ef0562db",
         "name": "Put Änderungen",
-        "func": "var item = msg.payload\nvar msg = { payload: msg.payload.length };\nvar community = flow.get(\"ComID\")\nvar webside = flow.get(\"webside\")\nvar token = flow.get(\"token\")\nvar storage = flow.get(\"StorLocations\")\nvar status = flow.get(\"FunktionStatus\");\nvar bestbefore\nvar inventur\nvar items=1\nvar description \nvar group = {}\nvar msg2 = {}\n\n// Wenn Artikel nicht gefunden wird kommt ein status 404 zurück daher wird hier manuell\n// ein leeres Item gebaut\nif (typeof item.status != \"undefined\") {\n    item={};\n    item.notfound=true;\n    item.gtin=flow.get(\"gtintemp\");\n    item.name=\"unbekannter Artikel\"\n    item.attributes=[];\n    item.attributes.push({\"count\":0})\n}\n// Wenn es zum Item eine Beschreibung gibt (wenn die Beschreibung nicht nicht beschreiben ist)\n// und wenn an erste Position der Beschreibung ein { zu finden ist also ein JSON Objekt festgelegt wurde\nif ((typeof item.description !=\"undefined\") && item.description[0]==\"{\"){\n    // Wenn dem so ist, dann wird das Json geparst und Objekt gebaut\nvar setinfo = JSON.parse(item.description ?? \"{ \\\"isset\\\": false, \\\"items\\\": 6, \\\"gtin\\\": \\\"13445\\\" , \\\"isingroup\\\": false , \\\"groupgtin\\\" : \\\"abc\\\"}\") // das hintere Objekt ist nur das der Parse nicht knallt\n    if(setinfo.isset){\n        item.gtin = setinfo.gtin ?? item.gtin // entweder es gibt schon ein Info das es ein set ist oder wenn das undefined oder null ist wird die Produkt gtin verwendet\n        items=setinfo.items??1  // auslesen wieviel Items im Set enthalten sind wenn nicht 1\n        group.isingrupe=setinfo.isingroup??false // Gehört der Artikel in eine Gruppe\n        group.gtin = (setinfo.groupgtin??\"Gabc\") // GroupGtin\n    }\n}\n\nflow.set(\"gtintemp\",null); // löschen des temporären gtins welcher gesetzt ist fals der Artiekel nicht bekannt ist ud ein 404 kommt\n\n//Anfrage vorbereiten\nif (item.gtin[0]==\"G\"){ // so soll ein Group Gtin aussehen, erster Buchstabe \"G\"\n    msg.url = webside + \"/stock/\" + community + \"/\" + flow.get(\"Gruppenlager\")??storage; // Wenn es eine Group gTin ist dann ab ins Gruppenlager\n} else {\n    msg.url = webside + \"/stock/\" + community + \"/\" + storage; // sonst das gespeicherte Lager nutzen\n}\n\n// Hier wird die Anfrage zusammen gebaut\nmsg.headers = {};\nmsg.headers['Authorization'] = 'Bearer ' + token;\n\n\n\n//Ab hier kommt die eigentliche Änderung eines bekannten Artikels\nvar attributanzahl = item.attributes.length \n\n// Status 1 Eingabe\nif (status == 1) {\n    var datum=flow.get(\"MHDDatum\")\n\n    if (typeof datum == \"undefined\"){\n       var datumv = false\n     }\n     else {\n        datumv=datum.fertig\n     }\n     // wenn vorher ein MHD gesetzt wurde wird es genutzt sonst gibts ein Objekt fals dran\n    if (datumv){ // wenn das datum fertig war\n         //datum.used=true; // markieren das das Datum genutzt wurde\n         for (let y = 0; y < attributanzahl; y++){ // durchlaufen aller attribute\n            if (typeof item.attributes[y].bestBeforeDate != \"undefined\") { // wenn ein bestbefore gesetzt ist\n              if (item.attributes[y].bestBeforeDate==datum.mhd){ // wenn das bestbefore gleich dem neu erfassten datum\n                  item.attributes[y].count = item.attributes[y].count + items;  // dann fügen wir hier die items hinzu (nicht nur eins da es ja ein set sein könnte)\n                    break;\n               } \n                 if (y == attributanzahl - 1 && item.attributes[y].bestBeforeDate != datum.mhd) { // wenn das gleiche Datum nicht gefunden wurde und wir schon an der letzten stelle sind\n                  item.attributes.push({ \"count\": items, \"bestBeforeDate\":datum.mhd }); // dann fügen wir ein neues Element der Liste hinzu und nutzten unser neues Datum\n                 break;\n                } \n             } else {\n           }\n             if (typeof item.attributes[y].bestBeforeDate == \"undefined\" && y == attributanzahl - 1)\n                item.attributes.push({ \"count\": items, \"bestBeforeDate\": datum.mhd }); // wir haben die ganze Liste durchsucht und sind beim letzten Eintrag angekommen, keiner stimmt überein also müssen wir einen neuen erzeugen\n         }\n     } else { // hier ist das Datum nicht eingegeben\n     bestbefore = item.attributes[attributanzahl-1].bestBeforeDate \n    if (typeof bestbefore == \"undefined\") { // bestbefore nicht definiert\n        \n            item.attributes[attributanzahl - 1].count = item.attributes[attributanzahl - 1].count + items;  // dann einfach hinzufügen\n    }\n    else{\n        \n            item.attributes.push({\"count\" :  items}); // sonst listenelement hinzu\n       \n    }\n     }\n    msg.payload = item; // Item an Payload dran\n\n    if (group.isingrupe){  //vvhbjhgvghj // haben wir eine Gruppe dann extrarunde\n        msg2.gtin = group.groupgtin\n        return [msg, msg2];  \n    } else {\n     return [msg, null];   // sonst raus an den request\n    }\n\n    \n}\n\n// Status 10 Inventur\nif (status == 10) {\n    if (typeof item.description == \"undefined\") { // es gibt keine Beschreibung\n        item.description = \"{\\\"inventur\\\" :  \"+items+\"}\" // Beschreibung hinzufügen fertig\n    \n    } else if (item.description[0] == \"{\") { // es gibt etwas in der Beschreibung aber ist es auch ein Jason?\n        description = {} // ja ist Jason also Objekt bauen\n        description = JSON.parse(item.description) //Aus dem String ein Jason machen\n        if (typeof description.inventur == undefined) { //gibt es inventur im jason noch nicht\n            description.inventur = items; // ne dann hinzufügen\n        } else {\n            description.inventur = description.inventur+items // doch dann hinzufügen\n        }\n        item.description = JSON.stringify(description)\n    } else { // es gibt eien Description aber sie ist nur text\n        item.description = \"{\\\"text\\\" :  \\\"\" + item.description + \"\\\", \\\"inventur\\\": \"+items+\"\\\" }\" // Textwegschreiben und inventur hinzufügen\n    }\n     \n    msg.payload = item; // Item an Payload dran\n\n     return [msg, null];   //  raus an den request\n\n    }\n\n// Status 10 Inventurdaten löschen\nif (status == 11) {\n\n    if (typeof item.description == \"undefined\") { // es gibt keine Beschreibung\n       return [] // es gibt nichts zu löschen\n\n    } else if (item.description[0] == \"{\") { // es gibt etwas in der Beschreibung aber ist es auch ein Jason?\n        description = {} // ja ist Jason also Objekt bauen\n        description = JSON.parse(item.description) //Aus dem String ein Jason machen\n        if (typeof description.inventur == undefined) { //gibt es inventur im jason noch nicht\n            return [] //dann gibts nix zu tun\n        } else {\n            description.inventur = null // sonst inventurdaten löschen\n        }\n        item.description = JSON.stringify(description)\n    } else { // es gibt eien Description aber sie ist nur text\n        item.description = \"{\\\"text\\\" :  \\\"\" + item.description + \"\\\", \\\"inventur\\\": }\" // Textwegschreiben und inventurdaten löschen\n    }\n\n    msg.payload = item; // Item an Payload dran\n    flow.set(\"FunktionStatus\", 3) //wir wollen nicht noch mehr löschen als Status info\n    return [msg, null];   //  raus an den request\n}\n\n//Status 2 Ausgabe\n if (status == 2) {\n     if (item.notfound??false ){\n         return null\n     }\n        item.attributes[0].count = item.attributes[0].count - 1;\n    if (item.attributes[0].count<1){\n        if (attributanzahl>1) {\n            item.attributes.shift();\n        } else {\n            item.attributes.shift();\n            item.attributes.push({ \"count\": 0 });\n        }\n        \n         }\n     msg.payload = item;\n     if (group.isingrupe) { //hgghjkjhgv\n        \n         msg2.gtin = group.groupgtin\n         return [msg, msg2];\n     } else {\n         return [msg, null];\n     }        \n} \n//Status 51 52 53 Bestätigung Artikel\nif (status == 51||status==52 || status==53){\n      if ((typeof item.description != \"undefined\")) {\n          item.description = item.description.replace(\"Added by REST API via GTIN \"+ item.gtin,\"-\")\n      }\n    //  flow.set(\"FunktionStatus\",status-50); //rücksetzen auf alten Status\n      msg.payload = item;\n    return [msg, null];\n}\n\n//Status 61 63 Erzeuge Set\nif (status == 61 || status == 63) {\n    if (typeof item.description == \"undefined\") {\n        item.description = \"{\\\"text\\\" :  \\\"\\\", \\\"isset\\\": false, \\\"items\\\": \" + (flow.get(\"SetItemAnzahl\") ?? \"1\")+\", \\\"gtin\\\": \\\"\" + (flow.get(\"SetGTIN\") ?? \"<setgtin>\")+\"\\\" }\"\n    } else if (item.description[0] == \"{\"){\n        description = {}\n        description=JSON.parse(item.description)\n        if (description.isset??false){\n            description.isset=false;\n        } else {\n        description.isset=true\n            description.items = flow.get(\"SetItemAnzahl\") ?? \"<itemanzahl>\"\n            description.gtin = flow.get(\"SetGTIN\")??\"<setgtin>\"\n        }\n        item.description = JSON.stringify(description)\n    } else {\n        item.description = \"{\\\"text\\\" :  \\\"\" + item.description + \"\\\", \\\"isset\\\": true, \\\"items\\\": \" + (flow.get(\"SetItemAnzahl\") ?? \"<itemanzahl>\") + \", \\\"gtin\\\": \\\"\" + (flow.get(\"SetGTIN\") ?? \"<setgtin>\")+\"\\\" }\"\n    }\n\n  //  flow.set(\"FunktionStatus\", status - 60); //rücksetzen auf alten Status\n    msg.payload = item;\n    return [msg, null];\n}\n\n//Status 71 73 Gruppe festlegen\nif (status == 71 || status == 73) { // nur im Status Eingabe und Info\n    if (typeof item.description == \"undefined\") { // Wenn es keine Beschreibung gibt ist es einfach \n        item.description = \"{\\\"text\\\" :  \\\"\\\", \\\"isingroup\\\": false, \\\"groupgtin\\\": \\\"<setgtin>\\\" }\" // JSON in die Description fertig\n    } else if (item.description[0] == \"{\") { // irgendwas ist in der Description und es beginnt mit { also ein JSON Objekt\n            description = {}\n            description = JSON.parse(item.description)\n        if (description.isingroup ?? false) {\n            description.isingroup = false;\n        } else {\n            description.isingroup = true\n            description.groupgtin = \"<groupegtin>\"\n        }\n            item.description = JSON.stringify(description)\n        } else { // Description ist befüllt aber mit keinem Objekt\n        item.description = \"{\\\"text\\\" :  \\\"\" + item.description + \"\\\", \\\"isingroup\\\": true, \\\"groupgtin\\\": \\\"<setgtin>\\\" }\" // dann los wir machen ein JSOn Objekt draus\n        }\n\n    // flow.set(\"FunktionStatus\", status - 70); //rücksetzen auf alten Status\n    msg.payload = item;\n    return [msg, null];\n}\n\n//Status 81 83 Namen ändern\nif (status == 81 || status == 83) { // nur im Status Eingabe und Info\n    item.name = flow.get(\"NewName\")??item.name;\n\n  //  flow.set(\"FunktionStatus\", status - 80); //rücksetzen auf alten Status\n    msg.payload = item;\n    return [msg, null];\n}\n\n//Status 91 93 Namen ändern\nif (status == 91 || status == 93) { // nur im Status Eingabe und Info\n     var beschreibung = flow.get(\"New_Description\") ?? \"\"\n    if (typeof item.description == \"undefined\") { // Wenn es keine Beschreibung gibt ist es einfach \n        item.description = \"{\\\"note\\\" :  \\\"\" + beschreibung+\"\\\" }\" // JSON in die Description fertig\n    } else if (item.description[0] == \"{\") { // irgendwas ist in der Description und es beginnt mit { also ein JSON Objekt\n        description = {}\n        description = JSON.parse(item.description)\n        description.text = description.text + beschreibung;\n        item.description = JSON.stringify(description)\n    } else { // Description ist befüllt aber mit keinem Objekt\n        item.description = \"{\\\"note\\\" :\" + beschreibung+ \"\\\"text\\\" :  \\\"\" + item.description +\"\\\"}\" // dann los wir machen ein JSOn Objekt draus\n    }\n    //  flow.set(\"FunktionStatus\", status - 90); //rücksetzen auf alten Status\n    msg.payload = item;\n    return [msg, null];\n}\n\n",
+        "func": "var item = msg.payload\nvar msg = { payload: msg.payload.length };\nvar community = flow.get(\"ComID\")\nvar webside = flow.get(\"webside\")\nvar token = flow.get(\"token\")\nvar storage = flow.get(\"StorLocations\")\nvar status = flow.get(\"FunktionStatus\");\nvar bestbefore\nvar inventur\nvar items=1\nvar description \nvar group = {}\nvar msg2 = {}\n\n// Wenn Artikel nicht gefunden wird kommt ein status 404 zurück daher wird hier manuell\n// ein leeres Item gebaut\nif (typeof item.status != \"undefined\") {\n    item={};\n    item.notfound=true;\n    item.gtin=flow.get(\"gtintemp\");\n    item.name=\"unbekannter Artikel\"\n    item.attributes=[];\n    item.attributes.push({\"count\":0})\n}\n// Wenn es zum Item eine Beschreibung gibt (wenn die Beschreibung nicht nicht beschreiben ist)\n// und wenn an erste Position der Beschreibung ein { zu finden ist also ein JSON Objekt festgelegt wurde\nif ((typeof item.description !=\"undefined\") && item.description[0]==\"{\" && status !=99){\n    // Wenn dem so ist, dann wird das Json geparst und Objekt gebaut\nvar setinfo = JSON.parse(item.description ?? \"{ \\\"isset\\\": false, \\\"items\\\": 6, \\\"gtin\\\": \\\"13445\\\" , \\\"isingroup\\\": false , \\\"groupgtin\\\" : \\\"abc\\\"}\") // das hintere Objekt ist nur das der Parse nicht knallt\n    if(setinfo.isset){\n        item.gtin = setinfo.gtin ?? item.gtin // entweder es gibt schon ein Info das es ein set ist oder wenn das undefined oder null ist wird die Produkt gtin verwendet\n        items=setinfo.items??1  // auslesen wieviel Items im Set enthalten sind wenn nicht 1\n        group.isingrupe=setinfo.isingroup??false // Gehört der Artikel in eine Gruppe\n        group.gtin = (setinfo.groupgtin??\"Gabc\") // GroupGtin\n    }\n}\n\nflow.set(\"gtintemp\",null); // löschen des temporären gtins welcher gesetzt ist fals der Artiekel nicht bekannt ist ud ein 404 kommt\n\n//Anfrage vorbereiten\nif (item.gtin[0]==\"G\"){ // so soll ein Group Gtin aussehen, erster Buchstabe \"G\"\n    msg.url = webside + \"/stock/\" + community + \"/\" + flow.get(\"Gruppenlager\")??storage; // Wenn es eine Group gTin ist dann ab ins Gruppenlager\n} else {\n    msg.url = webside + \"/stock/\" + community + \"/\" + storage; // sonst das gespeicherte Lager nutzen\n}\n\n// Hier wird die Anfrage zusammen gebaut\nmsg.headers = {};\nmsg.headers['Authorization'] = 'Bearer ' + token;\n\n\n\n//Ab hier kommt die eigentliche Änderung eines bekannten Artikels\nvar attributanzahl = item.attributes.length \n\n// Status 1 Eingabe ######################################################################\nif (status == 1) {\n    var datum=flow.get(\"MHDDatum\")\n\n    if (typeof datum == \"undefined\"){\n       var datumv = false\n     }\n     else {\n        datumv=datum.fertig\n     }\n     // wenn vorher ein MHD gesetzt wurde wird es genutzt sonst gibts ein Objekt fals dran\n    if (datumv){ // wenn das datum fertig war\n         //datum.used=true; // markieren das das Datum genutzt wurde\n         for (let y = 0; y < attributanzahl; y++){ // durchlaufen aller attribute\n            if (typeof item.attributes[y].bestBeforeDate != \"undefined\") { // wenn ein bestbefore gesetzt ist\n              if (item.attributes[y].bestBeforeDate==datum.mhd){ // wenn das bestbefore gleich dem neu erfassten datum\n                  item.attributes[y].count = item.attributes[y].count + items;  // dann fügen wir hier die items hinzu (nicht nur eins da es ja ein set sein könnte)\n                    break;\n               } \n                 if (y == attributanzahl - 1 && item.attributes[y].bestBeforeDate != datum.mhd) { // wenn das gleiche Datum nicht gefunden wurde und wir schon an der letzten stelle sind\n                  item.attributes.push({ \"count\": items, \"bestBeforeDate\":datum.mhd }); // dann fügen wir ein neues Element der Liste hinzu und nutzten unser neues Datum\n                 break;\n                } \n             } else {\n           }\n             if (typeof item.attributes[y].bestBeforeDate == \"undefined\" && y == attributanzahl - 1)\n                item.attributes.push({ \"count\": items, \"bestBeforeDate\": datum.mhd }); // wir haben die ganze Liste durchsucht und sind beim letzten Eintrag angekommen, keiner stimmt überein also müssen wir einen neuen erzeugen\n         }\n     } else { // hier ist das Datum nicht eingegeben\n     bestbefore = item.attributes[attributanzahl-1].bestBeforeDate \n    if (typeof bestbefore == \"undefined\") { // bestbefore nicht definiert\n        \n            item.attributes[attributanzahl - 1].count = item.attributes[attributanzahl - 1].count + items;  // dann einfach hinzufügen\n    }\n    else{\n        \n            item.attributes.push({\"count\" :  items}); // sonst listenelement hinzu\n       \n    }\n     }\n    msg.payload = item; // Item an Payload dran\n\n    if (group.isingrupe){  //vvhbjhgvghj // haben wir eine Gruppe dann extrarunde\n        msg2.gtin = group.groupgtin\n        return [msg, msg2];  \n    } else {\n     return [msg, null];   // sonst raus an den request\n    }\n\n    \n}\n\n// Status 10 Inventur  ######################################################################\nif (status == 10) {\n    if (typeof item.description == \"undefined\") { // es gibt keine Beschreibung\n        item.description = \"{\\\"inventur\\\" :  \"+items+\"}\" // Beschreibung hinzufügen fertig\n    \n    } else if (item.description[0] == \"{\") { // es gibt etwas in der Beschreibung aber ist es auch ein Jason?\n        description = {} // ja ist Jason also Objekt bauen\n        description = JSON.parse(item.description) //Aus dem String ein Jason machen\n        if (typeof description.inventur == undefined) { //gibt es inventur im jason noch nicht\n            description.inventur = items; // ne dann hinzufügen\n        } else {\n            description.inventur = description.inventur+items // doch dann hinzufügen\n        }\n        item.description = JSON.stringify(description)\n    } else { // es gibt eien Description aber sie ist nur text\n        item.description = \"{\\\"text\\\" :  \\\"\" + item.description + \"\\\", \\\"inventur\\\": \"+items+\"\\\" }\" // Textwegschreiben und inventur hinzufügen\n    }\n     \n    msg.payload = item; // Item an Payload dran\n\n     return [msg, null];   //  raus an den request\n\n    }\n\n// Status 11 Inventurdaten löschen  ######################################################################\nif (status == 11 || status ==12) {\n\n    if (typeof item.description == \"undefined\") { // es gibt keine Beschreibung\n       return [] // es gibt nichts zu löschen\n\n    } else if (item.description[0] == \"{\") { // es gibt etwas in der Beschreibung aber ist es auch ein Jason?\n        description = {} // ja ist Jason also Objekt bauen\n        description = JSON.parse(item.description) //Aus dem String ein Jason machen\n        if (typeof description.inventur == undefined) { //gibt es inventur im jason noch nicht\n            return [] //dann gibts nix zu tun\n        } else {\n            description.inventur = null // sonst inventurdaten löschen\n        }\n        item.description = JSON.stringify(description)\n    } else { // es gibt eien Description aber sie ist nur text\n        item.description = \"{\\\"text\\\" :  \\\"\" + item.description + \"\\\", \\\"inventur\\\": }\" // Textwegschreiben und inventurdaten löschen\n    }\n\n    msg.payload = item; // Item an Payload dran\n    return [msg, null];   //  raus an den request\n}\n\n//Status 2 Ausgabe  ######################################################################\n if (status == 2) {\n     if (item.notfound??false ){\n         return null\n     }\n        item.attributes[0].count = item.attributes[0].count - 1;\n    if (item.attributes[0].count<1){\n        if (attributanzahl>1) {\n            item.attributes.shift();\n        } else {\n            item.attributes.shift();\n            item.attributes.push({ \"count\": 0 });\n        }\n        \n         }\n     msg.payload = item;\n     if (group.isingrupe) { //hgghjkjhgv\n        \n         msg2.gtin = group.groupgtin\n         return [msg, msg2];\n     } else {\n         return [msg, null];\n     }        \n} \n//Status 51 52 53 Bestätigung Artikel  ######################################################################\nif (status == 51||status==52 || status==53){\n      if ((typeof item.description != \"undefined\")) {\n          item.description = item.description.replace(\"Added by REST API via GTIN \"+ item.gtin,\"-\")\n      }\n    //  flow.set(\"FunktionStatus\",status-50); //rücksetzen auf alten Status\n      msg.payload = item;\n    return [msg, null];\n}\n\n//Status 61 63 Erzeuge Set  ######################################################################\nif (status == 61 || status == 63) {\n    if (typeof item.description == \"undefined\") {\n        item.description = \"{\\\"text\\\" :  \\\"\\\", \\\"isset\\\": false, \\\"items\\\": \" + (flow.get(\"SetItemAnzahl\") ?? \"1\")+\", \\\"gtin\\\": \\\"\" + (flow.get(\"SetGTIN\") ?? \"<setgtin>\")+\"\\\" }\"\n    } else if (item.description[0] == \"{\"){\n        description = {}\n        description=JSON.parse(item.description)\n        if (description.isset??false){\n            description.isset=false;\n        } else {\n        description.isset=true\n            description.items = flow.get(\"SetItemAnzahl\") ?? \"<itemanzahl>\"\n            description.gtin = flow.get(\"SetGTIN\")??\"<setgtin>\"\n        }\n        item.description = JSON.stringify(description)\n    } else {\n        item.description = \"{\\\"text\\\" :  \\\"\" + item.description + \"\\\", \\\"isset\\\": true, \\\"items\\\": \" + (flow.get(\"SetItemAnzahl\") ?? \"<itemanzahl>\") + \", \\\"gtin\\\": \\\"\" + (flow.get(\"SetGTIN\") ?? \"<setgtin>\")+\"\\\" }\"\n    }\n\n  //  flow.set(\"FunktionStatus\", status - 60); //rücksetzen auf alten Status\n    msg.payload = item;\n    return [msg, null];\n}\n\n//Status 71 73 Gruppe festlegen  ######################################################################\nif (status == 71 || status == 73) { // nur im Status Eingabe und Info\n    if (typeof item.description == \"undefined\") { // Wenn es keine Beschreibung gibt ist es einfach \n        item.description = \"{\\\"text\\\" :  \\\"\\\", \\\"isingroup\\\": false, \\\"groupgtin\\\": \\\"<setgtin>\\\" }\" // JSON in die Description fertig\n    } else if (item.description[0] == \"{\") { // irgendwas ist in der Description und es beginnt mit { also ein JSON Objekt\n            description = {}\n            description = JSON.parse(item.description)\n        if (description.isingroup ?? false) {\n            description.isingroup = false;\n        } else {\n            description.isingroup = true\n            description.groupgtin = \"<groupegtin>\"\n        }\n            item.description = JSON.stringify(description)\n        } else { // Description ist befüllt aber mit keinem Objekt\n        item.description = \"{\\\"text\\\" :  \\\"\" + item.description + \"\\\", \\\"isingroup\\\": true, \\\"groupgtin\\\": \\\"<setgtin>\\\" }\" // dann los wir machen ein JSOn Objekt draus\n        }\n\n    // flow.set(\"FunktionStatus\", status - 70); //rücksetzen auf alten Status\n    msg.payload = item;\n    return [msg, null];\n}\n\n//Status 81 83 Namen ändern  ######################################################################\nif (status == 81 || status == 83) { // nur im Status Eingabe und Info\n    item.name = flow.get(\"NewName\");\n\n  //  flow.set(\"FunktionStatus\", status - 80); //rücksetzen auf alten Status\n    msg.payload = item;\n    return [msg, null];\n}\n\n//Status 91 93 Beschreibung ändern  ######################################################################\nif (status == 91 || status == 93) { // nur im Status Eingabe und Info\n     var beschreibung = flow.get(\"New_Description\") ?? \"\"\n    if (typeof item.description == \"undefined\") { // Wenn es keine Beschreibung gibt ist es einfach \n        item.description = \"{\\\"note\\\" :  \\\"\" + beschreibung+\"\\\" }\" // JSON in die Description fertig\n    } else if (item.description[0] == \"{\") { // irgendwas ist in der Description und es beginnt mit { also ein JSON Objekt\n        description = {}\n        description = JSON.parse(item.description)\n        description.note =   beschreibung;\n        item.description = JSON.stringify(description)\n    } else { // Description ist befüllt aber mit keinem Objekt\n        item.description = \"{\\\"note\\\": \\\"\" + beschreibung + \"\\\", \\\"text\\\": \\\"\" + item.description +\"\\\"}\" // dann los wir machen ein JSOn Objekt draus\n    }\n    //  flow.set(\"FunktionStatus\", status - 90); //rücksetzen auf alten Status\n    msg.payload = item;\n    return [msg, null];\n}\n\n//Status 99 Beschreibung komplett löschen  ######################################################################\nif (status == 99) { // nur im Status Eingabe und Info\n    \n    if (typeof item.description == \"undefined\") { // Wenn es keine Beschreibung gibt ist es einfach \n        return ;\n  \n    } else { // Description ist befüllt \n        item.description = \"-\" // dann alles weg\n    }\n\n    msg.payload = item;\n    return [msg, null];\n}\n\n",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
@@ -920,7 +922,7 @@
         "type": "debug",
         "z": "1ffe3e95ef0562db",
         "name": "debug 71",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -1103,7 +1105,8 @@
             "9eddf93a5405bceb",
             "f7a467125440195f",
             "15e3437555f9baf9",
-            "00876abb69010a2a"
+            "00876abb69010a2a",
+            "1f46869b22fbca64"
         ],
         "x": 1035,
         "y": 1740,
@@ -1135,7 +1138,9 @@
             "38e777ce7714f079",
             "5ab013b7293a076a",
             "5777faa5008372cd",
-            "24e20de737c19e94"
+            "24e20de737c19e94",
+            "930d4611be2b0795",
+            "08967757ed7ef1d5"
         ],
         "x": 235,
         "y": 1060,
@@ -1167,8 +1172,8 @@
         "type": "function",
         "z": "1ffe3e95ef0562db",
         "name": "function 72",
-        "func": "var msg2 = { payload: msg.payload.length };\nvar audio = {}\nvar status =flow.get(\"FunktionStatus\")\nvar unbekannterArtikel = {}\nvar item = msg.payload\n\n//Fehlerfall abfangen\nif (item.name.length<0??false)\n{\n  audio.payload=\"Es konnte keine Veränderung am Artikel durchgeführt werden.\"\n  return [null,audio]\n}\n\nswitch (status) {\n  case 1:\n  audio.payload=msg.payload.name + \" wurde hinzugefügt!\" \n  flow.set(\"SetArtikel\", { \"gtin\": msg.payload.gtin })\n  break;\n\n  case 10:\n  audio.payload=msg.payload.name + \" in Inventur!\" \n  flow.set(\"SetArtikel\", { \"gtin\": msg.payload.gtin })\n  break;\n\n  case 2:\n  audio.payload = \"einmal \" + msg.payload.name + \" wurde entfernt!\"\n  break;\n\n  case 51:\n  case 52:\n  case 53:\n    flow.set(\"FunktionStatus\", status - 50);\n    audio.payload = msg.payload.name + \" bestätigt!\"\n  break;\n  \n  case 61:\n  case 63:\n    flow.set(\"FunktionStatus\", status - 60);\n    // audio.payload = Set erfasst!\"\n  break;\n\n  case 71:\n  case 73:\n    flow.set(\"FunktionStatus\", status - 70);\n    // audio.payload = Gruppe vorbereitet!\"\n  break;\n\n  case 81:\n  case 83:\n    flow.set(\"FunktionStatus\", status - 80);\n    // audio.payload = Name angepasst!\"\n  break;\n\n  case 91:\n  case 93:\n    flow.set(\"FunktionStatus\", status - 90);\n    // audio.payload = Name angepasst!\"\n    break;\n\n}\n\n\n\n\n\n\nif (typeof msg.payload.description != \"undefined\" && msg.payload.description.includes(\"Added by\")) {  \n  audio.payload = audio.payload + \" Artikel automatisch hinzugefügt.\"\n//&& (msg.payload.attributes[0].count == 1) - wenn die Ansage nur beim ersten mal erfolgen soll\n unbekannterArtikel.marked=true;\n unbekannterArtikel.gtin = msg.payload.gtin\n}\nflow.set(\"unbekannterArtikel\",unbekannterArtikel);\nmsg2.payload=item\nreturn [msg2,audio];",
-        "outputs": 2,
+        "func": "var msg2 = { payload: msg.payload.length };\nvar audio = {}\nvar status =flow.get(\"FunktionStatus\")\nvar unbekannterArtikel = {}\nvar item = msg.payload\n\n//Fehlerfall abfangen\nif (item.name.length<0??false)\n{\n  audio.payload=\"Es konnte keine Veränderung am Artikel durchgeführt werden.\"\n  return [null,audio]\n}\n\nswitch (status) {\n  case 1:\n  audio.payload=msg.payload.name + \" wurde hinzugefügt!\" \n  flow.set(\"SetArtikel\", { \"gtin\": msg.payload.gtin })\n  break;\n\n  case 10:\n  audio.payload=msg.payload.name + \" in Inventur!\" \n  flow.set(\"SetArtikel\", { \"gtin\": msg.payload.gtin })\n  break;\n\n  case 11:\n    audio.payload = msg.payload.name + \" Inventurdaten gelöscht!\"\n    flow.set(\"FunktionStatus\", 3) //wir wollen nicht noch mehr löschen also Status info\n    flow.set(\"SetArtikel\", { \"gtin\": msg.payload.gtin })\n    break;\n\n  case 12:\n    \n    flow.set(\"SetArtikel\", { \"gtin\": msg.payload.gtin })\n    flow.set(\"FunktionStatus\", 3) //wir wollen nicht noch mehr löschen also Status info\n    msg2.payload=true;\n    return [null, null, msg2]; //Artikelliste neu laden\n    break;\n\n    \n\n  case 2:\n  audio.payload = \"einmal \" + msg.payload.name + \" wurde entfernt!\"\n  break;\n\n  case 51:\n  case 52:\n  case 53:\n    flow.set(\"FunktionStatus\", status - 50);\n    audio.payload = msg.payload.name + \" bestätigt!\"\n  break;\n  \n  case 61:\n  case 63:\n    flow.set(\"FunktionStatus\", status - 60);\n     audio.payload = \"Set erfasst!\"\n  break;\n\n  case 71:\n  case 73:\n    flow.set(\"FunktionStatus\", status - 70);\n    audio.payload = \"Gruppe vorbereitet!\"\n  break;\n\n  case 81:\n  case 83:\n    flow.set(\"FunktionStatus\", status - 80);\n     audio.payload = \"Name angepasst!\"\n  break;\n\n  case 91:\n  case 93:\n    flow.set(\"FunktionStatus\", status - 90);\n    audio.payload = \"Beschreibung angepasst!\"\n    break;\n\n\n  case 99:\n    //flow.set(\"FunktionStatus\", status - 90);\n    audio.payload = \"Beschreibung gelöscht!\"\n    break;\n\n}\n\n\n\n\n\n\nif (typeof msg.payload.description != \"undefined\" && msg.payload.description.includes(\"Added by\")) {  \n  audio.payload = audio.payload + \" Artikel automatisch hinzugefügt.\"\n//&& (msg.payload.attributes[0].count == 1) - wenn die Ansage nur beim ersten mal erfolgen soll\n unbekannterArtikel.marked=true;\n unbekannterArtikel.gtin = msg.payload.gtin\n}\nflow.set(\"unbekannterArtikel\",unbekannterArtikel);\nmsg2.payload=item\nreturn [msg2,audio,null];",
+        "outputs": 3,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -1181,7 +1186,11 @@
                 "244228991bb94831"
             ],
             [
+                "b368eab61c48fb0b",
                 "51936866122b7a69"
+            ],
+            [
+                "9fca27eb4dd81255"
             ]
         ]
     },
@@ -1398,7 +1407,7 @@
         "z": "1ffe3e95ef0562db",
         "name": "",
         "group": "1ef0514ec8cc871c",
-        "order": 9,
+        "order": 10,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -1533,7 +1542,9 @@
         "name": "link in 51",
         "links": [
             "4e2dd35054269e3b",
-            "c86aadaa9d8cc122"
+            "c86aadaa9d8cc122",
+            "5066ec24fab18f82",
+            "9fca27eb4dd81255"
         ],
         "x": 305,
         "y": 880,
@@ -1632,7 +1643,7 @@
         "group": "b5196438b63bee02",
         "voice": "Microsoft Katja - German (Germany)",
         "always": true,
-        "x": 1360,
+        "x": 1420,
         "y": 1200,
         "wires": []
     },
@@ -1951,8 +1962,8 @@
         "z": "1ffe3e95ef0562db",
         "name": "Barcodeliste",
         "info": "[https://barcode.tec-it.com/de/]()\n\n$Erfassung\n$Inventur\n$Ausgabe\n$Info\n$Loeschen\n$Lagerort:1\n$Lagerort:2\n$Lagerort:3\n$Lagerort:4\n$Lagerort:5\n$Lagerort:6\n\n$Lagerort:7\n$Lagerort:8\n$Lagerort:9\n$Lagerort:10\n#Tag:01\n#Tag:02\n#Tag:03\n#Tag:04\n#Tag:05\n#Tag:06\n\n#Tag:07\n#Tag:08\n#Tag:09\n#Tag:10\n#Tag:11\n#Tag:12\n#Tag:13\n#Tag:14\n#Tag:15\n#Tag:16\n\n#Tag:17\n#Tag:18\n#Tag:19\n#Tag:20\n#Tag:21\n#Tag:22\n#Tag:23\n#Tag:24\n#Tag:25\n#Tag:26\n\n#Tag:27\n#Tag:28\n#Tag:29\n#Tag:30\n#Tag:31\n#Monat:01\n#Monat:02\n#Monat:03\n#Monat:04\n#Monat:05\n\n#Monat:06\n#Monat:07\n#Monat:08\n#Monat:09\n#Monat:10\n#Monat:11\n#Monat:12\n#Jahr:2024\n#Jahr:2025\n#Jahr:2026\n\n#Jahr:2027\n#Jahr:2028\n#Jahr:2029\n#Jahr:2030\n$ArtikelOk\n$SetAnlegen",
-        "x": 230,
-        "y": 1980,
+        "x": 310,
+        "y": 80,
         "wires": []
     },
     {
@@ -2015,7 +2026,8 @@
         "y": 1340,
         "wires": [
             [
-                "a7d8bc011b9cb21d"
+                "a7d8bc011b9cb21d",
+                "35ca4bc3873a1410"
             ]
         ]
     },
@@ -2088,7 +2100,7 @@
         "z": "1ffe3e95ef0562db",
         "name": "",
         "group": "b5196438b63bee02",
-        "order": 15,
+        "order": 14,
         "width": 4,
         "height": 1,
         "passthru": false,
@@ -2206,7 +2218,7 @@
         "z": "1ffe3e95ef0562db",
         "name": "",
         "group": "1ef0514ec8cc871c",
-        "order": 10,
+        "order": 11,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -2306,7 +2318,7 @@
         "type": "comment",
         "z": "1ffe3e95ef0562db",
         "name": "ToDo",
-        "info": "Inventurauswertung\n- neue Tab\n- Inventur nur für erfasste\n- Inventur auch für nicht erfasste\n- Inventur zurücksetzen\n- hinzufügen zur Einkaufsliste\n\n",
+        "info": "Inventurauswertung\n- hinzufügen zur Einkaufsliste\n\n",
         "x": 130,
         "y": 80,
         "wires": []
@@ -2318,7 +2330,7 @@
         "name": "",
         "events": "change",
         "x": 680,
-        "y": 2800,
+        "y": 2940,
         "wires": [
             []
         ]
@@ -2335,7 +2347,7 @@
         "finalize": "",
         "libs": [],
         "x": 490,
-        "y": 2720,
+        "y": 2860,
         "wires": [
             [
                 "e6922270bf4e45d3"
@@ -2354,7 +2366,7 @@
         "finalize": "",
         "libs": [],
         "x": 490,
-        "y": 2800,
+        "y": 2940,
         "wires": [
             [
                 "e6922270bf4e45d3"
@@ -2367,7 +2379,7 @@
         "z": "1ffe3e95ef0562db",
         "name": "",
         "group": "1ef0514ec8cc871c",
-        "order": 6,
+        "order": 7,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -2382,10 +2394,11 @@
         "topic": "topic",
         "topicType": "msg",
         "x": 210,
-        "y": 2720,
+        "y": 2860,
         "wires": [
             [
-                "9dc2988cc49568dc"
+                "9dc2988cc49568dc",
+                "139cc31bb0107be0"
             ]
         ]
     },
@@ -2395,7 +2408,7 @@
         "z": "1ffe3e95ef0562db",
         "name": "",
         "group": "1ef0514ec8cc871c",
-        "order": 7,
+        "order": 8,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -2410,10 +2423,11 @@
         "topic": "topic",
         "topicType": "msg",
         "x": 210,
-        "y": 2800,
+        "y": 2940,
         "wires": [
             [
-                "f732723d7a37196c"
+                "f732723d7a37196c",
+                "80f7b99124f9edf1"
             ]
         ]
     },
@@ -2429,10 +2443,11 @@
             "7d945b093dd37735"
         ],
         "x": 315,
-        "y": 2700,
+        "y": 2840,
         "wires": [
             [
-                "9dc2988cc49568dc"
+                "9dc2988cc49568dc",
+                "139cc31bb0107be0"
             ]
         ]
     },
@@ -2448,10 +2463,11 @@
             "b84b635dfb802555"
         ],
         "x": 315,
-        "y": 2760,
+        "y": 2900,
         "wires": [
             [
-                "f732723d7a37196c"
+                "f732723d7a37196c",
+                "80f7b99124f9edf1"
             ]
         ]
     },
@@ -2488,7 +2504,7 @@
         "d": true,
         "name": "",
         "group": "1ef0514ec8cc871c",
-        "order": 8,
+        "order": 9,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -2781,7 +2797,7 @@
         "type": "debug",
         "z": "1ffe3e95ef0562db",
         "name": "debug 93",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -2828,7 +2844,7 @@
         "z": "1ffe3e95ef0562db",
         "group": "b5196438b63bee02",
         "order": 8,
-        "width": 9,
+        "width": 8,
         "height": 2,
         "name": "",
         "label": "",
@@ -2848,7 +2864,7 @@
         "type": "function",
         "z": "1ffe3e95ef0562db",
         "name": "function 80",
-        "func": "msg.payload = (\"Name: \" + msg.payload.Name + \"<br/>\" + \" Barcode: \" + msg.payload.Barcode + \"<br/>\" + \" Anzahl: \" + msg.payload.Anzahl + \"<br/>\" + \" Beschreibung: \"+msg.payload.Beschreibung)??\"-\"\nreturn msg;",
+        "func": "flow.set(\"selectedArticle\", msg.payload.Barcode)\nflow.set(\"SetArtikel\", { \"gtin\": msg.payload.Barcode })\n\n\n\nif (msg.payload.Beschreibung.includes(\"Added by\")) {\n    var unbekannterArtikel = {}\n    unbekannterArtikel.marked = true;\n    unbekannterArtikel.gtin = msg.payload.Barcode\n\nflow.set(\"unbekannterArtikel\", unbekannterArtikel);\n}\n\nmsg.payload = (\"Name: \" + msg.payload.Name + \"<br/>\" + \" Barcode: \" + msg.payload.Barcode + \"<br/>\" + \" Anzahl: \" + msg.payload.Anzahl + \"<br/>\" + \" Beschreibung: \"+msg.payload.Beschreibung)??\"-\"\n\nreturn msg",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2905,8 +2921,8 @@
             "8cf3d1a644bc6dae",
             "a84505c975269766"
         ],
-        "x": 715,
-        "y": 2700,
+        "x": 725,
+        "y": 2720,
         "wires": [
             [
                 "5fc3610cd5e8e2e0"
@@ -2960,7 +2976,7 @@
         "type": "function",
         "z": "1ffe3e95ef0562db",
         "name": "Artikel Name ändern",
-        "func": "if (msg.payload!=\"Hinweis\"){  // beenden wenn die Scanner Funktion nicht die richtige ist\n    return [null, null]\n}\n\nvar setArtikel = flow.get(\"SetArtikel\")\nvar audio = {}\nif (setArtikel.gtin != 0 ?? false) {\n    msg.gtin = setArtikel.gtin\n} else {\n    audio.payload = \"Der letzte Artikel wurde nicht richtig erkannt bitte erneut scannen\"\n    flow.set(\"FunktionStatus\", 3)\n    return [null, audio]\n}\n\nvar status = flow.get(\"FunktionStatus\");\n\n    switch (status) {\n        case 1:\n            flow.set(\"FunktionStatus\",91)\n            audio.payload=\"Bitte Hinweis eingeben\";\n            msg.payload = \"Bitte Hinweis eingeben\";\n            break;\n        case 2:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Ausgabe kann der Name nicht verändert werden, wechsel auf Info\";\n            msg = null\n            break;\n        case 3:\n            flow.set(\"FunktionStatus\", 93)\n            audio.payload = \"Bitte Hinweis eingeben\";\n            msg.payload = \"Bitte Hinweis eingeben\";\n            break;\n        case 4:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Löschen kann der Name nicht verändert werden, wechsel auf Info\";\n            msg = null;\n            break;\n        default:\n            audio.payload = \"Es wurde kein Status erkannt\";\n            return[null, audio];\n    }\n\nreturn [msg, audio];",
+        "func": "if (msg.payload!=\"Beschreibung\"){  // beenden wenn die Scanner Funktion nicht die richtige ist\n    return [null, null]\n}\n\nvar setArtikel = flow.get(\"SetArtikel\")\nvar audio = {}\nif (setArtikel.gtin != 0 ?? false) {\n    msg.gtin = setArtikel.gtin\n} else {\n    audio.payload = \"Der letzte Artikel wurde nicht richtig erkannt bitte erneut scannen\"\n    flow.set(\"FunktionStatus\", 3)\n    return [null, audio]\n}\n\nvar status = flow.get(\"FunktionStatus\");\n\n    switch (status) {\n        case 1:\n            flow.set(\"FunktionStatus\",91)\n            audio.payload=\"Bitte Beschreibung eingeben\";\n            msg.payload = \"Bitte Beschreibung eingeben\";\n            break;\n        case 2:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Ausgabe kann der Beschreibung nicht verändert werden, wechsel auf Info\";\n            msg = null\n            break;\n        case 3:\n            flow.set(\"FunktionStatus\", 93)\n            audio.payload = \"Bitte Beschreibung eingeben\";\n            msg.payload = \"Bitte Beschreibung eingeben\";\n            break;\n        case 4:\n            flow.set(\"FunktionStatus\", 3)\n            audio.payload = \"Im Status Löschen kann der Beschreibung nicht verändert werden, wechsel auf Info\";\n            msg = null;\n            break;\n        case 99:\n            flow.set(\"FunktionStatus\", 93)\n            audio.payload = \"Bitte Beschreibung eingeben\";\n            msg.payload = \"Bitte Beschreibung eingeben\";\n            break;\n        default:\n            audio.payload = \"Es wurde kein Status erkannt\";\n            return[null, audio];\n    }\n\nreturn [msg, audio];",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
@@ -2984,21 +3000,21 @@
         "z": "1ffe3e95ef0562db",
         "name": "",
         "group": "b5196438b63bee02",
-        "order": 14,
-        "width": 4,
+        "order": 13,
+        "width": 5,
         "height": 1,
         "passthru": false,
-        "label": "Hinweis hinzufügen",
+        "label": "Beschreibung hinzufügen",
         "tooltip": "",
         "color": "",
         "bgcolor": "{{msg.bgcolor}}",
         "className": "",
         "icon": "",
-        "payload": "Hinweis",
+        "payload": "Beschreibung",
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 210,
+        "x": 230,
         "y": 2420,
         "wires": [
             [
@@ -3085,20 +3101,23 @@
         "id": "3c57fbf342455a31",
         "type": "function",
         "z": "1ffe3e95ef0562db",
-        "name": "Save New Name",
-        "func": "if (msg.payload == \"Cancel\") {\n    return null;\n}\n\nvar setArtikel = flow.get(\"SetArtikel\")\n\nif (setArtikel.gtin != 0 ?? false) {\n    msg.gtin = setArtikel.gtin\n}\n\nflow.set(\"New_Description\", msg.payload)\nreturn msg;",
-        "outputs": 1,
+        "name": "Save New Description",
+        "func": "if (msg.payload == \"Cancel\") {\n    msg.payload=true\n    return [null,msg];\n}\n\nvar setArtikel = flow.get(\"SetArtikel\")\n\nif (setArtikel.gtin != 0 ?? false) {\n    msg.gtin = setArtikel.gtin\n}\n\nflow.set(\"New_Description\", msg.payload)\nreturn [msg, null];",
+        "outputs": 2,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1210,
+        "x": 1220,
         "y": 2400,
         "wires": [
             [
                 "5777faa5008372cd",
                 "b84b635dfb802555",
                 "ab7e8e0a798e0fbc"
+            ],
+            [
+                "b84b635dfb802555"
             ]
         ]
     },
@@ -3124,8 +3143,8 @@
         "links": [
             "a1957464e760a693"
         ],
-        "x": 1385,
-        "y": 2360,
+        "x": 1375,
+        "y": 2480,
         "wires": []
     },
     {
@@ -3163,7 +3182,7 @@
         "allowrate": false,
         "outputs": 1,
         "x": 750,
-        "y": 2960,
+        "y": 3060,
         "wires": [
             [
                 "cc02e927e625b9df"
@@ -3182,7 +3201,7 @@
         "finalize": "",
         "libs": [],
         "x": 330,
-        "y": 2960,
+        "y": 3060,
         "wires": [
             [
                 "9c31d4c13b8fd134"
@@ -3204,7 +3223,7 @@
         "finalize": "",
         "libs": [],
         "x": 1010,
-        "y": 2960,
+        "y": 3060,
         "wires": [
             [
                 "bfbdf266d2175009"
@@ -3227,10 +3246,11 @@
             "9eddf93a5405bceb",
             "f7a467125440195f",
             "15e3437555f9baf9",
-            "00876abb69010a2a"
+            "00876abb69010a2a",
+            "1f46869b22fbca64"
         ],
         "x": 1155,
-        "y": 2960,
+        "y": 3060,
         "wires": []
     },
     {
@@ -3248,10 +3268,12 @@
             "81618511bf3ff4eb",
             "d7fe9c4b368f9cd0",
             "1c92acfdf8b7c6f1",
-            "1420914f4cd04c3e"
+            "1420914f4cd04c3e",
+            "5066ec24fab18f82",
+            "9fca27eb4dd81255"
         ],
         "x": 145,
-        "y": 3000,
+        "y": 3100,
         "wires": [
             [
                 "94f550504fcf6fcf"
@@ -3265,7 +3287,7 @@
         "name": "Reset \"Ausgabe\"",
         "info": "",
         "x": 200,
-        "y": 2880,
+        "y": 2980,
         "wires": []
     },
     {
@@ -3286,7 +3308,7 @@
         "allowrate": false,
         "outputs": 1,
         "x": 500,
-        "y": 3000,
+        "y": 3100,
         "wires": [
             [
                 "9c31d4c13b8fd134"
@@ -3315,7 +3337,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 150,
-        "y": 2940,
+        "y": 3040,
         "wires": [
             [
                 "94f550504fcf6fcf"
@@ -3344,7 +3366,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 750,
-        "y": 2920,
+        "y": 3020,
         "wires": [
             [
                 "cc02e927e625b9df"
@@ -3558,16 +3580,6 @@
         ]
     },
     {
-        "id": "413a1450d034eb65",
-        "type": "comment",
-        "z": "1ffe3e95ef0562db",
-        "name": "Todo Community auswählen",
-        "info": "",
-        "x": 1200,
-        "y": 400,
-        "wires": []
-    },
-    {
         "id": "1fab230c3d71f51f",
         "type": "function",
         "z": "1ffe3e95ef0562db",
@@ -3665,7 +3677,7 @@
         "z": "1ffe3e95ef0562db",
         "name": "",
         "group": "b5196438b63bee02",
-        "order": 10,
+        "order": 11,
         "width": 5,
         "height": 1,
         "passthru": false,
@@ -3877,7 +3889,7 @@
         "type": "function",
         "z": "1ffe3e95ef0562db",
         "name": "Prepare Table Inventur",
-        "func": "var options = [];\nlet length = msg.payload.length\nvar name\nvar gtin\nvar count\nvar bestbefore\nvar description\nvar anzahl =0;\n\nif (msg.payload.length==0){\n    \n    return msg;\n}\n\nfor (let x = 0; x < length; x++) {\n    \n    name = msg.payload[x].name;\n    gtin = msg.payload[x].gtin;\n\n    if (msg.payload[x].attributes.length > 0) {\n        for (let y = 0; y < msg.payload[x].attributes.length; y++) {\n            anzahl = anzahl+ msg.payload[x].attributes[y].count??0\n        }\n        if (typeof msg.payload[x].description == undefined) {\n            description = {}; \n        }  else {\n            try{  \n                description = JSON.parse(msg.payload[x].description) //Aus dem String ein Jason machen\n                } catch (e) {\n                description = {}; \n            } \n        }  \n \n        if (typeof description.inventur == \"undefined\") { //gibt es inventur im jason noch nicht\n            if (msg.task == 2) {\n                options.push({ \"Name\": name, \"Barcode\": gtin, \"Anzahl\": anzahl, \"Inventur\": \"-\", \"Beschreibung\": msg.payload[x].description });\n                continue;\n             }\n            else {\n                continue;\n            }\n        }\n        if (description.inventur!=anzahl){\n            options.push({ \"Name\": name, \"Barcode\": gtin, \"Anzahl\": anzahl, \"Inventur\": description.inventur, \"Beschreibung\": msg.payload[x].description });\n\n        }\n        else{\n            if (msg.task == 3) {\n                options.push({ \"Name\": name, \"Barcode\": gtin, \"Anzahl\": anzahl, \"Inventur\": description.inventur, \"Beschreibung\": msg.payload[x].description });\n                continue;\n             }\n            else {\n                continue;\n            }\n        }\n    }\n    else {\n        continue;\n    }\n\n }\nmsg = { payload: msg.payload.length };\nmsg.payload = options;\nreturn msg;\n\n",
+        "func": "var options = [];\nlet length = msg.payload.length\nvar name\nvar gtin\nvar count\nvar bestbefore\nvar description\nvar anzahl =0;\n\nif (msg.payload.length==0){\n    \n    return msg;\n}\n\nfor (let x = 0; x < length; x++) {\n    \n    name = msg.payload[x].name;\n    gtin = msg.payload[x].gtin;\n\n    if (msg.payload[x].attributes.length > 0) {\n        for (let y = 0; y < msg.payload[x].attributes.length; y++) {\n            anzahl = anzahl+ msg.payload[x].attributes[y].count??0\n        }\n        if (typeof msg.payload[x].description == undefined) {\n            description = {}; \n        }  else {\n            try{  \n                description = JSON.parse(msg.payload[x].description) //Aus dem String ein Jason machen\n                } catch (e) {\n                description = {}; \n            } \n        }  \n \n        if (typeof description.inventur == \"undefined\" || description.inventur == null) { //gibt es inventur im jason noch nicht\n            if (msg.task == 2 ) {\n                options.push({ \"Name\": name, \"Barcode\": gtin, \"Anzahl\": anzahl, \"Inventur\": \"-\", \"Beschreibung\": msg.payload[x].description });\n                continue;\n             }\n            else {\n                continue;\n            }\n        }\n        if (description.inventur!=anzahl){\n            options.push({ \"Name\": name, \"Barcode\": gtin, \"Anzahl\": anzahl, \"Inventur\": description.inventur, \"Beschreibung\": msg.payload[x].description });\n\n        }\n        else{\n            if (msg.task == 3) {\n                options.push({ \"Name\": name, \"Barcode\": gtin, \"Anzahl\": anzahl, \"Inventur\": description.inventur, \"Beschreibung\": msg.payload[x].description });\n                continue;\n             }\n            else {\n                continue;\n            }\n        }\n    }\n    else {\n        continue;\n    }\n\n }\nmsg = { payload: msg.payload.length };\nmsg.payload = options;\nreturn msg;\n\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -4110,8 +4122,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 390,
-        "y": 3860,
+        "x": 370,
+        "y": 3940,
         "wires": [
             [
                 "5d2835860b13c409"
@@ -4130,8 +4142,8 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 590,
-        "y": 3860,
+        "x": 570,
+        "y": 3940,
         "wires": []
     },
     {
@@ -4155,8 +4167,8 @@
         "topic": "",
         "payload": "{\"Count\":2,\"text\":\"test\"}",
         "payloadType": "str",
-        "x": 170,
-        "y": 3860,
+        "x": 150,
+        "y": 3940,
         "wires": [
             [
                 "ea0c620f083cf8d4"
@@ -4184,8 +4196,8 @@
         "topic": "",
         "payload": "{\"Count\":2,\"text\":null}",
         "payloadType": "str",
-        "x": 170,
-        "y": 3900,
+        "x": 150,
+        "y": 3980,
         "wires": [
             [
                 "ea0c620f083cf8d4"
@@ -4283,8 +4295,8 @@
         "type": "ui_button",
         "z": "1ffe3e95ef0562db",
         "name": "",
-        "group": "b5196438b63bee02",
-        "order": 11,
+        "group": "b4daf2cc34335a6f",
+        "order": 15,
         "width": 5,
         "height": 1,
         "passthru": false,
@@ -4364,17 +4376,558 @@
         ]
     },
     {
-        "id": "cc5ab560ee71576e",
-        "type": "ui_spacer",
+        "id": "6563712360720269",
+        "type": "inject",
         "z": "1ffe3e95ef0562db",
-        "name": "spacer",
-        "group": "b5196438b63bee02",
-        "order": 13,
-        "width": 1,
-        "height": 1
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 4080,
+        "wires": [
+            [
+                "b160321eb6b1f4d6"
+            ]
+        ]
     },
     {
-        "id": "741fda7f47b581e2",
+        "id": "b160321eb6b1f4d6",
+        "type": "function",
+        "z": "1ffe3e95ef0562db",
+        "name": "function 110",
+        "func": "for (let i = 0; i < 4; i++) {\n    msg.payload= \"Versuch \"+ i\n    node.send(msg)\n}\n\nreturn;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 4080,
+        "wires": [
+            [
+                "5c271ff70e467f7d"
+            ]
+        ]
+    },
+    {
+        "id": "5c271ff70e467f7d",
+        "type": "telegrambot-notify",
+        "z": "1ffe3e95ef0562db",
+        "name": "",
+        "bot": "be43bf6b.22928",
+        "chatId": "1479464684",
+        "message": "",
+        "parseMode": "",
+        "x": 600,
+        "y": 4080,
+        "wires": []
+    },
+    {
+        "id": "d9027b51a6f76094",
+        "type": "http request",
+        "z": "1ffe3e95ef0562db",
+        "name": "Get Stock",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 580,
+        "y": 3800,
+        "wires": [
+            [
+                "373626957a9bec66",
+                "f730ac244605cecb"
+            ]
+        ]
+    },
+    {
+        "id": "a799cadc07ca4f70",
+        "type": "function",
+        "z": "1ffe3e95ef0562db",
+        "name": "function 111",
+        "func": "var community = flow.get(\"ComID\")\nvar webside = flow.get(\"webside\")\nvar token = flow.get(\"token\")\nvar storage = flow.get(\"StorLocations\")\n\nmsg.url = webside + \"/stock/\" + community + \"/\" + storage;\nmsg.headers = {};\nmsg.headers['Authorization'] = 'Bearer ' + token;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 3800,
+        "wires": [
+            [
+                "d9027b51a6f76094"
+            ]
+        ]
+    },
+    {
+        "id": "15e894a1b538ede7",
+        "type": "ui_button",
+        "z": "1ffe3e95ef0562db",
+        "name": "",
+        "group": "1ef0514ec8cc871c",
+        "order": 12,
+        "width": 6,
+        "height": 1,
+        "passthru": false,
+        "label": "Alle Inventurdaten löschen",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "3",
+        "payloadType": "num",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 140,
+        "y": 3800,
+        "wires": [
+            [
+                "a799cadc07ca4f70"
+            ]
+        ]
+    },
+    {
+        "id": "373626957a9bec66",
+        "type": "debug",
+        "z": "1ffe3e95ef0562db",
+        "name": "debug 115",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 3740,
+        "wires": []
+    },
+    {
+        "id": "e49e668b4d85de7e",
+        "type": "function",
+        "z": "1ffe3e95ef0562db",
+        "name": "function 112",
+        "func": " \nif(msg.payload=\"OK\")\n {\n    for (let i = 0; i < msg.list.length; i++) {\n        flow.set(\"FunktionStatus\", 12)\n        msg.gtin=msg.list[i].gtin\n        node.send(msg)\n    }\n    \n\n }\n\n\nreturn ;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1130,
+        "y": 3800,
+        "wires": [
+            [
+                "63f98e0378fb6d6b",
+                "930d4611be2b0795"
+            ]
+        ]
+    },
+    {
+        "id": "47b82094ec75746a",
+        "type": "ui_toast",
+        "z": "1ffe3e95ef0562db",
+        "position": "dialog",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Cancel",
+        "raw": false,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 950,
+        "y": 3800,
+        "wires": [
+            [
+                "e49e668b4d85de7e",
+                "b9cbb290d6920f17"
+            ]
+        ]
+    },
+    {
+        "id": "f730ac244605cecb",
+        "type": "change",
+        "z": "1ffe3e95ef0562db",
+        "name": "",
+        "rules": [
+            {
+                "t": "move",
+                "p": "payload",
+                "pt": "msg",
+                "to": "list",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Wirklich alle Inventurdaten des Ablageortes löschen?",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 770,
+        "y": 3800,
+        "wires": [
+            [
+                "47b82094ec75746a",
+                "b9cbb290d6920f17"
+            ]
+        ]
+    },
+    {
+        "id": "63f98e0378fb6d6b",
+        "type": "debug",
+        "z": "1ffe3e95ef0562db",
+        "name": "debug 116",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1350,
+        "y": 3740,
+        "wires": []
+    },
+    {
+        "id": "b9cbb290d6920f17",
+        "type": "debug",
+        "z": "1ffe3e95ef0562db",
+        "name": "debug 117",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1150,
+        "y": 3740,
+        "wires": []
+    },
+    {
+        "id": "930d4611be2b0795",
+        "type": "link out",
+        "z": "1ffe3e95ef0562db",
+        "name": "hole Artikel",
+        "mode": "link",
+        "links": [
+            "3fe38321abd0d3df"
+        ],
+        "x": 1305,
+        "y": 3800,
+        "wires": []
+    },
+    {
+        "id": "9fca27eb4dd81255",
+        "type": "link out",
+        "z": "1ffe3e95ef0562db",
+        "name": "Tabellefuellen",
+        "mode": "link",
+        "links": [
+            "c88746db718a1d74",
+            "852a052dbffc2899",
+            "468b18f344701787"
+        ],
+        "x": 1315,
+        "y": 1240,
+        "wires": []
+    },
+    {
+        "id": "cac61001e968282f",
+        "type": "ui_button",
+        "z": "1ffe3e95ef0562db",
+        "name": "",
+        "group": "b5196438b63bee02",
+        "order": 9,
+        "width": 1,
+        "height": 2,
+        "passthru": false,
+        "label": "Send",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 1450,
+        "y": 980,
+        "wires": [
+            [
+                "6581a14a0392af9b"
+            ]
+        ]
+    },
+    {
+        "id": "6581a14a0392af9b",
+        "type": "function",
+        "z": "1ffe3e95ef0562db",
+        "name": "function 113",
+        "func": "msg.gtin=flow.get(\"selectedArticle\")||0\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1650,
+        "y": 980,
+        "wires": [
+            [
+                "08967757ed7ef1d5",
+                "ee9113f776f5eb88"
+            ]
+        ]
+    },
+    {
+        "id": "08967757ed7ef1d5",
+        "type": "link out",
+        "z": "1ffe3e95ef0562db",
+        "name": "hole Artikel",
+        "mode": "link",
+        "links": [
+            "3fe38321abd0d3df"
+        ],
+        "x": 1755,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "ee9113f776f5eb88",
+        "type": "debug",
+        "z": "1ffe3e95ef0562db",
+        "name": "debug 118",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1810,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "b368eab61c48fb0b",
+        "type": "debug",
+        "z": "1ffe3e95ef0562db",
+        "name": "debug 119",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1450,
+        "y": 1240,
+        "wires": []
+    },
+    {
+        "id": "50ed66269a97a6c5",
+        "type": "debug",
+        "z": "1ffe3e95ef0562db",
+        "name": "debug 120",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1170,
+        "y": 1720,
+        "wires": []
+    },
+    {
+        "id": "94a64673a322912d",
+        "type": "ui_button",
+        "z": "1ffe3e95ef0562db",
+        "name": "",
+        "group": "b5196438b63bee02",
+        "order": 15,
+        "width": 5,
+        "height": 1,
+        "passthru": false,
+        "label": "Lösche Beschreibung",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "{{msg.bgcolor}}",
+        "className": "",
+        "icon": "",
+        "payload": "1",
+        "payloadType": "num",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 420,
+        "y": 2700,
+        "wires": [
+            [
+                "adde428c20416639"
+            ]
+        ]
+    },
+    {
+        "id": "adde428c20416639",
+        "type": "function",
+        "z": "1ffe3e95ef0562db",
+        "name": "function 114",
+        "func": "msg.payload = \"Beschreibung Löschen\"\nflow.set(\"FunktionStatus\", 99)\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 2700,
+        "wires": [
+            [
+                "fa2b33115440bce5",
+                "5fc3610cd5e8e2e0"
+            ]
+        ]
+    },
+    {
+        "id": "4e926d66a1b7cfb4",
+        "type": "function",
+        "z": "1ffe3e95ef0562db",
+        "name": "Farbe",
+        "func": "var status = flow.get(\"FunktionStatus\")||0;\nvar msg = { payload: msg.payload.length };\nif (status==99){\n   msg.bgcolor = \"red\" \n} else {\n   msg.bgcolor = \"blub\" \n}\n    \nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 250,
+        "y": 2700,
+        "wires": [
+            [
+                "94a64673a322912d"
+            ]
+        ]
+    },
+    {
+        "id": "1f46869b22fbca64",
+        "type": "link in",
+        "z": "1ffe3e95ef0562db",
+        "name": "link in 65",
+        "links": [
+            "bfbdf266d2175009",
+            "de927cf5fb76b284",
+            "fa2b33115440bce5"
+        ],
+        "x": 145,
+        "y": 2700,
+        "wires": [
+            [
+                "4e926d66a1b7cfb4"
+            ]
+        ]
+    },
+    {
+        "id": "0c6a54fd8ef3c00b",
+        "type": "ui_ui_control",
+        "z": "1ffe3e95ef0562db",
+        "name": "",
+        "events": "change",
+        "x": 1040,
+        "y": 2940,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "139cc31bb0107be0",
+        "type": "function",
+        "z": "1ffe3e95ef0562db",
+        "name": "function 115",
+        "func": "msg = { payload: { \"group\": { \"close\": [\"Speisekammer_Inventur\"] } } }\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 850,
+        "y": 2860,
+        "wires": [
+            [
+                "0c6a54fd8ef3c00b"
+            ]
+        ]
+    },
+    {
+        "id": "80f7b99124f9edf1",
+        "type": "function",
+        "z": "1ffe3e95ef0562db",
+        "name": "function 116",
+        "func": "msg = { payload: { \"group\": { \"open\": [\"Speisekammer_Inventur\"] } } }\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 850,
+        "y": 2900,
+        "wires": [
+            [
+                "0c6a54fd8ef3c00b"
+            ]
+        ]
+    },
+    {
+        "id": "35ca4bc3873a1410",
+        "type": "debug",
+        "z": "1ffe3e95ef0562db",
+        "name": "debug 121",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "5fd81023679b674e",
         "type": "ui_spacer",
         "z": "1ffe3e95ef0562db",
         "name": "spacer",
@@ -4384,7 +4937,17 @@
         "height": 1
     },
     {
-        "id": "37bd1ff68b7a5fda",
+        "id": "9bbf65cafd529db3",
+        "type": "ui_spacer",
+        "z": "1ffe3e95ef0562db",
+        "name": "spacer",
+        "group": "1ef0514ec8cc871c",
+        "order": 6,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "f27581f7127cfdc8",
         "type": "ui_spacer",
         "z": "1ffe3e95ef0562db",
         "name": "spacer",
@@ -4394,7 +4957,7 @@
         "height": 1
     },
     {
-        "id": "d95c6ce8cbc78a11",
+        "id": "94d8cd592773094f",
         "type": "ui_spacer",
         "z": "1ffe3e95ef0562db",
         "name": "spacer",
@@ -4435,6 +4998,14 @@
         "width": "19",
         "collapse": true,
         "className": ""
+    },
+    {
+        "id": "be43bf6b.22928",
+        "type": "telegrambot-config",
+        "botname": "Smarthome",
+        "usernames": "Grisu_Leipzig",
+        "chatIds": "",
+        "pollInterval": "300"
     },
     {
         "id": "6b1243d835d9c436",
